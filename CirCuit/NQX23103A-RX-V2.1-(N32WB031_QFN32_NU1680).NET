@@ -1,0 +1,251 @@
+PARTS LIST
+
+TEST              ANT3            ANT
+ANT1              ANT-BLUE        ANT1
+TEST              TP1.6D          B+
+10uF/16V          C0603-T         C1
+22UF              C0805-T         C2
+10uF/16V          C0603-T         C3
+0.1UF             C0603-T         C4
+100nF             C0603-T         C5
+10UF              C0603-T         C6
+10UF              C0603-T         C7
+10uF/16V          C0603-T         C8
+0.1UF             C0603-T         C9
+100nF/50V         C1206-T         C10
+100nF/50V         C1206-T         C11
+47nF/50V          C0603-T         C12
+NC                C1206-T         C13
+2.2nF/50V         C0603-T         C14
+100NF/16V         C0603-T         C15
+47nF/50V          C0603-T         C16
+10UF              C0603-T         C17
+100nF/16V         C0603-T         C18
+1uF               C0603-T         C19
+10uF/16V          C0603-T         C20
+1UF               C0603-T         C21
+100pF             C0603-T         C23
+1.2pF             C0603-T         C24
+2.2uF             C0603-T         C25
+100nF             C0603-T         C26
+100nF             C0603-T         C27
+6pF               C0603-T         C29
+2.4pF             C0603-T         C30
+470nF             C0603-T         C31
+0.1uF             C0603-T         C32
+10uF              C0603-T         C33
+100nF             C0603-T         C34
+10uF              C0603-T         C37
+10uF              C0603-T         C38
+1UF               C0603-T         C43
+1UF               C0603-T         C44
+0.1UF             C0603-T         C46
+10UF              C0603-T         C47
+12P               C0603-T         C48
+12P               C0603-T         C49
+100nF             C0603-T         C50
+NC                C0603-T         C51
+1.2pF             C0603-T         C52
+10PF              C0603-T         C55
+10PF              C0603-T         C56
+2P_2.0_Œ‘Ã˘         PH2.0-WT-2P     CON1
+SS34              SMA             D1
+SS34              SMA             D2
+1N5819            SOD-123         D4
+SS34              SMA             D11
+470UF/16V         EC6.3-P2.5mm-R  EC1
+470UF/16V         EC6.3-P2.5mm-L  EC3
+TEST              TP1.6D          GND
+CN5P_1.25¡¢ Ω       CON-5P-1.25-90  J3
+HDR-1X4           CN4P2.0         JP1
+1nH               R0603-T         L1
+4.7uH             L5X5            L2
+15.8UH            L5-S            L3
+33nH              R0603-T         L4
+27nH              R0603-T         L5
+1.3nH             R0603-T         L6
+4.7uH             L5X5            L7
+4.7uH             R0603-T         L8
+TEST              TP1.6D          M+
+TEST              TP1.6D          M-
+MARK1.1           Mark            MR1
+MARK1.1           Mark            MR2
+2P_2.0_Œ‘Ã˘         PH2.0-WT-2P     MT1
+WSD3050DN         DFN3X3_8P       Q1
+SS8050            SOT-23          Q2
+0.1R              R0805-T         R1
+10K               R0603-T         R2
+NC                R0603-T         R3
+10K               R0603-T         R4
+NC                R0603-T         R5
+220R              R0805-T         R6
+10R               R0603-T         R7
+10K               R0603-T         R8
+0R                R0603-T         R9
+0R                R0603-T         R10
+0R                R0603-T         R11
+10K               R0603-T         R14
+                  C0603-T         R17
+47K1%             R0603-T         R19
+NC                R0603-T         R20
+200K              R0603-T         R23
+1K                R0603-T         R25
+3K                R0603-T         R26
+604K              R0603-T         R27
+1K                R0603-T         R28
+10K               R0603-T         R39
+510K              R0603-T         R40
+68K               R0603-T         R41
+10K               R0603-T         R42
+5.1K              R0603-T         R46
+0.1R              R0805-T         R55
+NC                R0805A          RT1
+3*6               SW 3*6*4.3-S-W  SW1
+TEST              TP1.0S          TP7
+TEST              TP1.0S          TP8
+TEST              TP1.0S          TP9
+N32WB031KEQ6      QFN32_4X4MM     U1
+NU1680            DFN16-3X3       U1
+WSL2309           TDFN-10_L3.0-W3.0-P0.50-BL-EPU2
+WF480RA           SOP8_M          U8
+ME6208A30PG       SOT-89          U9
+FP6291            SOT-23-6        U11
+32M               OSC3225         X1
+6.7458MHz         OSC-3x8-WI-B    X2
+32.768kHz         OSC-3x8-WI-B    Y1
+EOS
+NET LIST
+
+NODENAME 433_DATA         $
+    U1         1  U8         5
+NODENAME 433_EN           $
+    U1         2  U8         6
+NODENAME AC1              $
+    C10        1  C11        1  C12        2  C13        1  C14        1  U1        16
+NODENAME AC2              $
+    C14        2  C16        1  L3         1  U1         5
+NODENAME AGND             $
+    ANT1       2  C5         1  C19        1  C21        1  C24        1  C25        1  C27        1  C29        1  C31        1  C32        1  C33        1  C38        1  C43        1  C44        1  C46        2  C47        2  C48        2  C49        2  C50        2  C51        1  C52        1  C55        1  C56        1  JP1        2  L4         1  L5         1  R11        1  R27        1  SW1        1  U1        33  U8         1  U9         1  X1         2  X1         4  X2         1
+NODENAME BAT              $
+    B+         1  C7         1  C26        2  C37        2  CON1       1  D2         1  R1         1  R19        2  R55        1  U2         7  U9         2
+NODENAME BAT-AD           $
+    C34        2  R19        1  R20        2  U1        16
+NODENAME BOOST_EN1        $
+    R39        2  U1        19
+NODENAME CD_EN1           $
+    R4         1  U1         4
+NODENAME CHRG             $
+    U1        32  U2         3
+NODENAME GND              $
+    C1         1  C2         2  C3         2  C6         2  C7         2  C8         1  C9         1  C15        2  C17        2  C18        2  C20        2  C26        1  C34        1  C37        1  CON1       2  CON1       3  EC1        2  EC3        2  GND        1  MT1        3  Q1         1  Q1         2  Q1         3  Q2         2  R2         1  R3         2  R8         2  R11        2  R20        1  R41        1  RT1        1  U1         1  U1         4  U1        17  U2         9  U2        11  U11        2
+NODENAME IN_B/OS1         $
+    R5         1  U1         8
+NODENAME KEY              $
+    R46        1  SW1        2  TP7        1  U1        11
+NODENAME LEDB             $
+    R25        2  U1        12
+NODENAME LEDG             $
+    R26        2  U1        13
+NODENAME LEDR             $
+    R28        2  U1        14
+NODENAME LEDSM1           $
+    J3         4  TP9        1  U1        17
+NODENAME LEDSM2           $
+    J3         5  TP8        1  U1        18
+NODENAME NetANT1-1        $
+    ANT1       1  C52        2  L1         2
+NODENAME NetANT-1         $
+    ANT        1  C29        2  C30        2  L5         2  R17        1  R17        2
+NODENAME NetC4-1          $
+    C4         1  U2         2
+NODENAME NetC10-2         $
+    C10        2  C11        2  C13        2  L3         2
+NODENAME NetC12-1         $
+    C12        1  U1         2
+NODENAME NetC15-1         $
+    C15        1  R3         1  U1        12
+NODENAME NetC16-2         $
+    C16        2  U1         3
+NODENAME NetC17-1         $
+    C17        1  D1         2  D2         2  L7         1  U11        5
+NODENAME NetC23-1         $
+    C23        1  C24        2  L1         1
+NODENAME NetC23-2         $
+    C23        2  C51        2  L6         2  U1        25
+NODENAME NetC25-2         $
+    C25        2  C46        1  U1         8
+NODENAME NetC30-1         $
+    C30        1  L4         2  U8         2
+NODENAME NetC31-2         $
+    C31        2  U8         4
+NODENAME NetD4-1          $
+    D4         1  M-         1  MT1        2  Q1         5  Q1         6  Q1         7  Q1         8
+NODENAME NetD11-1         $
+    D11        1  L7         2  U11        1
+NODENAME NetJ3-1          $
+    J3         1  R25        1
+NODENAME NetJ3-2          $
+    J3         2  R26        1
+NODENAME NetJ3-3          $
+    J3         3  R28        1
+NODENAME NetL2-1          $
+    L2         1  U2        10
+NODENAME NetL2-2          $
+    L2         2  R1         2  R55        2  U2         8
+NODENAME NetL6-1          $
+    L6         1  U1        26
+NODENAME NetL8-1          $
+    L8         1  U1        23
+NODENAME NetQ1-4          $
+    Q1         4  R7         1  R8         1
+NODENAME NetQ2-1          $
+    Q2         1  R2         2  R4         2  R14        2
+NODENAME NetQ2-3          $
+    Q2         3  U2         5
+NODENAME NetR6-2          $
+    R6         2  U1         7
+NODENAME NetR10-2         $
+    R10        2  U9         3
+NODENAME NetR39-1         $
+    R39        1  U11        4
+NODENAME NetR40-1         $
+    R40        1  R41        2  U11        3
+NODENAME NetRT1-2         $
+    RT1        2  U2         6
+NODENAME NetU8-8          $
+    U8         8  X2         2
+NODENAME OSCI_32K         $
+    C55        2  U1         9  Y1         1
+NODENAME OSCO_32K         $
+    C56        2  U1        10  Y1         2
+NODENAME PWMMOTO          $
+    R7         2  U1        15
+NODENAME RESET            $
+    C19        2  R42        2  U1         3
+NODENAME STDBY            $
+    U1        31  U2         4
+NODENAME SWCLK            $
+    JP1        4  U1         5
+NODENAME SWDATA           $
+    JP1        3  U1         6
+NODENAME V5V              $
+    C8         2  R5         2  U1        13
+NODENAME VCC3.3V          $
+    C27        2  C32        2  C33        2  C38        2  C47        1  C50        1  JP1        1  R9         2  R10        1  R42        1  R46        2  U1        22  U8         3
+NODENAME VCCQB            $
+    C6         1  C9         2  D4         2  D11        2  EC3        1  M+         1  MT1        1  R40        2
+NODENAME VCCRF            $
+    C21        2  R9         1  U1        28
+NODENAME VDCDRF           $
+    C43        2  C44        2  L8         2  U1        24  U1        27
+NODENAME VOUT             $
+    C1         2  C2         1  C4         2  D1         1  EC1        1  R14        1  R23        2  U1        14  U2         1
+NODENAME VOUT_AD          $
+    C5         2  R23        1  R27        2  U1         7
+NODENAME VRECT            $
+    C3         1  C18        1  C20        1  R6         1  U1         6  U1        15
+NODENAME XSCI             $
+    C48        1  U1        30  X1         1
+NODENAME XSCO             $
+    C49        1  U1        29  X1         3
+EOS

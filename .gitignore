@@ -1,0 +1,47 @@
+# General
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.log
+*.lock
+
+# IDE / editor
+.vscode/
+
+# Keil / uVision generated files
+**/Objects/
+**/Listings/
+**/bin/
+**/*.uvguix.*
+**/*.uvoptx
+**/*.axf
+**/*.bin
+**/*.hex
+**/*.map
+**/*.htm
+**/*.dep
+**/*.crf
+**/*.d
+**/*.o
+**/*.lnp
+**/*.sct
+
+# Debug / programming tool artifacts
+**/JLinkLog.txt
+**/JLinkSettings.ini
+**/uv4.log
+**/uv4.log.lock
+
+
+Doc/JLink_V892.zip
+
+Doc/JLink_V892/
+
+Code/utilities/dfu/JLink/
+Code/utilities/dfu/NSUtil/
+Code/utilities/dfu/NSpyocd/
+Code/utilities/dfu/NSAndroidUtil/
+
+Code/utilities/dfu/Image/
+Code/utilities/dfu/keys/private_key.pem

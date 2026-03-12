@@ -1,0 +1,29 @@
+# Keil / uVision generated files
+Objects/
+Listings/
+bin/
+
+# IDE local files
+.vscode/
+*.uvguix.*
+*.uvoptx
+
+# Logs and debug artifacts
+*.log
+*.lock
+JLinkLog.txt
+JLinkSettings.ini
+
+# Build outputs
+*.axf
+*.bin
+*.hex
+*.map
+*.htm
+*.dep
+*.crf
+*.d
+*.o
+*.lnp
+*.sct
+
