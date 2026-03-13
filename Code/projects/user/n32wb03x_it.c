@@ -35,6 +35,7 @@
 #include "n32wb03x_it.h"
 #include "wf433.h"
 #include "led.h"
+#include "app_gpio.h"
 
 /** @addtogroup n32wb03x_StdPeriph_Template
  * @{
@@ -113,9 +114,9 @@ void EXTI0_1_IRQHandler(void)
 
 void EXTI2_3_IRQHandler(void)
 {
-    if (RESET != EXTI_GetITStatus(KEY_INPUT_EXTI_LINE))
+    if (RESET != EXTI_GetITStatus(CHARGING_INPUT_EXTI_LINE))
     {
-        EXTI_ClrITPendBit(KEY_INPUT_EXTI_LINE);
+        EXTI_ClrITPendBit(CHARGING_INPUT_EXTI_LINE);
     }
 }
 /**
@@ -128,3 +129,6 @@ void EXTI2_3_IRQHandler(void)
 /**
  * @}
  */
+
+
+

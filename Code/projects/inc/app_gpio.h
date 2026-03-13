@@ -54,8 +54,17 @@ extern "C" {
 #define KEY_INPUT_PIN_SOURCE  GPIO_PIN_SOURCE1
 #define KEY_INPUT_IRQn        EXTI0_1_IRQn
 
-#define POWER_KEY_GET   GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_1)
-#define DC_IN_GET   GPIO_ReadInputDataBit(GPIOA, GPIO_PIN_6)
+#define POWER_KEY_GET     GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_1)
+/* PA6 当前语义为“正在充电”检测，高电平表示充电进行中。 */
+#define CHARGING_GET     GPIO_ReadInputDataBit(GPIOA, GPIO_PIN_6)
+
+
+#define CHARGING_INPUT_PORT        GPIOA
+#define CHARGING_INPUT_PIN         GPIO_PIN_6
+#define CHARGING_INPUT_EXTI_LINE   EXTI_LINE2
+#define CHARGING_INPUT_PORT_SOURCE GPIOA_PORT_SOURCE
+#define CHARGING_INPUT_PIN_SOURCE  GPIO_PIN_SOURCE6
+#define CHARGING_INPUT_IRQn        EXTI2_3_IRQn
 
 /* NU1680 电源路径控制/状态脚 */
 #define NU1680_STDBY_SET   GPIO_SetBits(GPIOA, GPIO_PIN_0)
@@ -96,6 +105,7 @@ void gpio_init(void);
 //void LedOff(GPIO_Module* GPIOx, uint16_t Pin);
 //void LedBlink(GPIO_Module* GPIOx, uint16_t Pin);
 void KeyInputExtiInit(GPIO_Module* GPIOx, uint16_t Pin, FunctionalState Cmd);
+void ChargingInputExtiInit(FunctionalState Cmd);
 
 #ifdef __cplusplus
 }
@@ -113,3 +123,6 @@ void KeyInputExtiInit(GPIO_Module* GPIOx, uint16_t Pin, FunctionalState Cmd);
 /**
  * @}
  */
+
+
+

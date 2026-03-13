@@ -1,6 +1,7 @@
 #include "protocol.h"
 #include "mkey.h"
 #include "led.h"
+#include "app_ota_feature.h"
 
 const eventParameter_t NetDateInit[5] = {{0,0,0,0,0,0,0,0x7f,1,0},
 																 {0,0,0,0,0,0,0,0x7f,1,0},
@@ -31,6 +32,7 @@ void Module_Config(void)
 {
 	net.WORD = 0;
 	upData.DWORD = 0;
+	app_ota_feature_init();
 }		
 void Module_Reset(void)
 {
@@ -243,6 +245,10 @@ void app_data_parse_task(void)
 						upData.DPID026Back = 1;
 						upData.DPID027Back = 1;
 					}break;
+					default:
+					{
+						(void)app_ota_feature_handle_command(&Rx);
+					}break;
 				}
 //				alarmMode = 1;
 			}
@@ -289,7 +295,11 @@ void app_data_up_task(void)
 //	{
 		memset(Tx.Buffer,0,sizeof(Tx.Buffer));
 	
-		if(upData.DiDaBack)
+		if(app_ota_feature_prepare_tx(&Tx, &Length.WORD))
+		{
+			UARTTxData(Length.WORD);
+		}
+		else if(upData.DiDaBack)
 		{
 			Tx.CommandWord = 0x00;
       if(net.DiDaFirst){Tx.FunctionalData[0] = 1;}

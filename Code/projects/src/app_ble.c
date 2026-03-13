@@ -53,6 +53,7 @@
 #include "bat.h"
 #include "wf433.h"
 #include "aromaevent.h"
+#include "app_ota_feature.h"
 /** @addtogroup 
  * @{
  */
@@ -67,6 +68,11 @@
 /* Private functions ---------------------------------------------------------*/
 void app_ble_connected(void);
 void app_ble_disconnected(void);
+static bool app_is_off_charging_display_mode(void)
+{
+    /* 关机充电显示模式：仅在关机且检测到“正在充电”时进入。 */
+    return ((power.status == POWER_OFF) && (CHARGING_GET));
+}
 
 /**
  * @brief  user message handler
@@ -88,42 +94,57 @@ void app_user_msg_handler(ke_msg_id_t const msgid, void const *p_param)
 				if(power.status == POWER_OFF) {if(++power.offTime > 1000) power.offTime = 1000;}
 					else { power.offTime = 0; }
 					
-		airpump_gpio_out();
-					Key_Task0();
-					Led_Task();
+				if(!app_is_off_charging_display_mode())
+				{
+					airpump_gpio_out();
+				}
+				Key_Task0();
+				Led_Task();
 		if(++ReceiveIdleCount > 200) ReceiveIdleCount = 200;
 		if(++SendIdleCount > 200) SendIdleCount = 200;
 					ke_timer_set(APP_5MS_EVT, TASK_APP, 5);
     		break;
     	case APP_20MS_EVT:
 				
-			wf433_data_task();
+			if(!app_is_off_charging_display_mode())
+			{
+				wf433_data_task();
+			}
 					ke_timer_set(APP_20MS_EVT, TASK_APP, 20);
     		break;
 			
     	case APP_100MS_EVT:
 				
-					ring_buffer_read();
-					app_data_parse_task();
-			
-			event_Task();
+					if(!app_is_off_charging_display_mode())
+					{
+						ring_buffer_read();
+						app_data_parse_task();
+						app_ota_feature_poll();
+						event_Task();
+						app_data_up_task();
+					}
 			BAT_Task();
-			app_data_up_task();
 //					LedBlink(LED2_PORT,LED2_PIN);
 					ke_timer_set(APP_100MS_EVT, TASK_APP, 100);
     		break;
 			
     	case APP_500MS_EVT:
 				
+			if(!app_is_off_charging_display_mode())
+			{
         RTC_DateShow();
         RTC_TimeShow();
+			}
 					ke_timer_set(APP_500MS_EVT, TASK_APP, 500);
     		break;
 			
     	case APP_1S_EVT:
-				oil_currentVolume_calculate_task();
-				oil_surplusDay_task();
-			Iap_Data_Comparison();
+				if(!app_is_off_charging_display_mode())
+				{
+					oil_currentVolume_calculate_task();
+					oil_surplusDay_task();
+					Iap_Data_Comparison();
+				}
 				ke_timer_set(APP_1S_EVT, TASK_APP, 1000);
     		break;
 			
@@ -403,3 +424,7 @@ void app_ble_disconnected(void)
 /**
  * @}
  */
+
+
+
+

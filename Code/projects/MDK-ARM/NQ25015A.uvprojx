@@ -963,6 +963,16 @@
               <FilePath>..\user\protocol.c</FilePath>
             </File>
             <File>
+              <FileName>app_ota_feature.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_ota_feature.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_nv_store.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_nv_store.c</FilePath>
+            </File>
+            <File>
               <FileName>ringbuffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\ringbuffer.c</FilePath>
@@ -1001,6 +1011,11 @@
               <FileName>bat.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\bat.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_sys.c</FilePath>
             </File>
             <File>
               <FileName>wf433.c</FileName>
@@ -1809,6 +1824,16 @@
               <FilePath>..\user\protocol.c</FilePath>
             </File>
             <File>
+              <FileName>app_ota_feature.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_ota_feature.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_nv_store.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_nv_store.c</FilePath>
+            </File>
+            <File>
               <FileName>ringbuffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\ringbuffer.c</FilePath>
@@ -1847,6 +1872,11 @@
               <FileName>bat.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\bat.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_sys.c</FilePath>
             </File>
             <File>
               <FileName>wf433.c</FileName>
@@ -2654,6 +2684,16 @@
               <FilePath>..\user\protocol.c</FilePath>
             </File>
             <File>
+              <FileName>app_ota_feature.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_ota_feature.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_nv_store.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_nv_store.c</FilePath>
+            </File>
+            <File>
               <FileName>ringbuffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\ringbuffer.c</FilePath>
@@ -2692,6 +2732,11 @@
               <FileName>bat.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\bat.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app_sys.c</FilePath>
             </File>
             <File>
               <FileName>wf433.c</FileName>

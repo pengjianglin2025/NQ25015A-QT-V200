@@ -2,6 +2,7 @@
 #include "app_gpio.h"
 #include "aroma.h"
 #include "iap.h"
+#include "app_sys.h"
 
 bat_t bat;
 
@@ -113,19 +114,7 @@ void BAT_Task(void)
 				{
 					if(++cntC > 50)
 					{
-						power.status = POWER_OFF;
-						/* 低电保护关机前先保存参数，避免掉电丢失配对码等关键数据。 */
-						Iap_Write();
-						ns_ble_disconnect();
-						ns_ble_adv_stop();
-						EN_6291_CLR;
-						/* 电量保护关机时同步拉高 STDBY，避免外围残流 */
-						NU1680_STDBY_SET;
-						airpump_pwm_force_off();
-						WF433_EN_SW_SET;
-						aroma.en = OFF;
-						airpump.SW = 0;
-						fan.SW = OFF;
+						app_sys_power_set(POWER_OFF);
 						cntC=0;
 					}
 				}
@@ -137,11 +126,20 @@ void BAT_Task(void)
 	}
 
 	
-	if(DC_IN_GET)
+	if(CHARGING_GET)
 	{
 //		PowerOffTime = 0;
 		cntB = 0;
-		if(++cntA > 5)
+		if(power.status == POWER_OFF)
+		{
+			cntA = 0;
+			if(bat.status != BAT_CHARGE)
+			{
+				bat.status = BAT_CHARGE; EN_WSL2309_SET;
+				bat.volRange = VOLTAGE_RANGE1;
+			}
+		}
+		else if(++cntA > 5)
 		{
 			cntA = 0;
 			if(bat.status != BAT_CHARGE)
@@ -246,11 +244,15 @@ void Bat_Monitor(void)
 
 void BAT_Sleep_Config(void)
 {
-//	SYS_SET_IOCFG(IOP01CFG,SYS_IOCFG_P01_GPIO);				/*设置为GPIO模式*/	
+//	SYS_SET_IOCFG(IOP01CFG,SYS_IOCFG_P01_GPIO);				/*?????GPIO??*/	
 //	GPIO_CONFIG_IO_MODE(GPIO0,GPIO_PIN_1,GPIO_MODE_INPUT);	
 //	
-//	SYS_SET_IOCFG(IOP04CFG,SYS_IOCFG_P04_GPIO);				/*设置为GPIO模式*/	
+//	SYS_SET_IOCFG(IOP04CFG,SYS_IOCFG_P04_GPIO);				/*?????GPIO??*/	
 //	GPIO_CONFIG_IO_MODE(GPIO0,GPIO_PIN_4,GPIO_MODE_INPUT);	
 }
+
+
+
+
 
 

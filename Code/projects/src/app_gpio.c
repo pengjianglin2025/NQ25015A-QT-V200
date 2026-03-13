@@ -87,11 +87,13 @@ void KeyInputExtiInit(GPIO_Module* GPIOx, uint16_t Pin, FunctionalState Cmd)
     GPIO_ConfigEXTILine(KEY_INPUT_PORT_SOURCE, KEY_INPUT_PIN_SOURCE);
 
     /*Configure key EXTI line*/
+    EXTI_ClrITPendBit(KEY_INPUT_EXTI_LINE);
     EXTI_InitStructure.EXTI_Line    = KEY_INPUT_EXTI_LINE;
     EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
     EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling; // EXTI_Trigger_Rising;
     EXTI_InitStructure.EXTI_LineCmd = Cmd;
     EXTI_InitPeripheral(&EXTI_InitStructure);
+    EXTI_ClrITPendBit(KEY_INPUT_EXTI_LINE);
 
     /*Set key input interrupt priority*/
     NVIC_InitStructure.NVIC_IRQChannel                   = KEY_INPUT_IRQn;
@@ -102,6 +104,35 @@ void KeyInputExtiInit(GPIO_Module* GPIOx, uint16_t Pin, FunctionalState Cmd)
 
 
 
+void ChargingInputExtiInit(FunctionalState Cmd)
+{
+    GPIO_InitType GPIO_InitStructure;
+    EXTI_InitType EXTI_InitStructure;
+    NVIC_InitType NVIC_InitStructure;
+
+    RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOA | RCC_APB2_PERIPH_AFIO, ENABLE);
+
+    GPIO_InitStruct(&GPIO_InitStructure);
+    GPIO_InitStructure.Pin = CHARGING_INPUT_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_MODE_INPUT;
+    GPIO_InitStructure.GPIO_Pull = GPIO_NO_PULL;
+    GPIO_InitPeripheral(CHARGING_INPUT_PORT, &GPIO_InitStructure);
+
+    GPIO_ConfigEXTILine(CHARGING_INPUT_PORT_SOURCE, CHARGING_INPUT_PIN_SOURCE);
+
+    EXTI_ClrITPendBit(CHARGING_INPUT_EXTI_LINE);
+    EXTI_InitStructure.EXTI_Line = CHARGING_INPUT_EXTI_LINE;
+    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_InitStructure.EXTI_LineCmd = Cmd;
+    EXTI_InitPeripheral(&EXTI_InitStructure);
+    EXTI_ClrITPendBit(CHARGING_INPUT_EXTI_LINE);
+
+    NVIC_InitStructure.NVIC_IRQChannel = CHARGING_INPUT_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = Cmd;
+    NVIC_Init(&NVIC_InitStructure);
+}
 void gpio_init(void)
 {
 	GPIO_InitType GPIO_InitStructure;
@@ -113,7 +144,7 @@ void gpio_init(void)
 	GPIO_InitStruct(&GPIO_InitStructure);
 	GPIO_InitStructure.Pin = GPIO_PIN_1;
 	GPIO_InitStructure.GPIO_Mode = GPIO_MODE_INPUT;
-	/* 按键脚上拉，避免悬空导致误按键、误唤醒。 */
+	/* ?????????????????????????????????? */
 	GPIO_InitStructure.GPIO_Pull = GPIO_PULL_UP;
 	GPIO_InitPeripheral(GPIOB, &GPIO_InitStructure);
 	
@@ -121,8 +152,8 @@ void gpio_init(void)
 	GPIO_InitStruct(&GPIO_InitStructure);
 	GPIO_InitStructure.Pin = GPIO_PIN_6;
 	GPIO_InitStructure.GPIO_Mode = GPIO_MODE_INPUT;
-	/* 充电检测脚下拉，避免悬空导致充电状态误判。 */
-	GPIO_InitStructure.GPIO_Pull = GPIO_PULL_DOWN;
+	/* ??????????????????????3???????С? */
+	GPIO_InitStructure.GPIO_Pull = GPIO_NO_PULL;
 	GPIO_InitPeripheral(GPIOA, &GPIO_InitStructure);
 	
 	//led
@@ -180,7 +211,7 @@ void gpio_init(void)
 	GPIO_InitStructure.Pin = GPIO_PIN_0;
 	GPIO_InitStructure.GPIO_Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitPeripheral(GPIOA, &GPIO_InitStructure);
-	/* STDBY 默认为工作态，关机/睡眠准备时再拉高进入待机 */
+	/* STDBY ??????????????/??????????????????? */
 	NU1680_STDBY_CLR;
 	
 	GPIO_InitStruct(&GPIO_InitStructure);
@@ -246,3 +277,8 @@ void gpio_init(void)
 /**
  * @}
  */
+
+
+
+
+

@@ -4,60 +4,9 @@
 #include "wf433.h"
 #include "aroma.h"
 #include "iap.h"
+#include "app_sys.h"
 
 key_t key;
-
-/* 关机时立即关闭外部负载，避免等待周期任务造成残留电流。 */
-static void key_power_hw_shutdown(void)
-{
-	EN_6291_CLR;
-	/* 关机后拉高 STDBY，确保 NU1680 进入待机 */
-	NU1680_STDBY_SET;
-	airpump_pwm_force_off();
-	WF433_EN_SW_SET;
-	LED_RED_SET;
-	LED_GREEN_SET;
-	LED_BLUE_SET;
-	LED_COM1_CLR;
-	LED_COM2_CLR;
-	aroma.en = OFF;
-	airpump.SW = 0;
-	fan.SW = OFF;
-	if(DC_IN_GET)
-	{
-		EN_WSL2309_SET;
-	}
-	else
-	{
-		EN_WSL2309_CLR;
-	}
-}
-
-/* 统一电源状态切换入口：同步处理 BLE 与外设电源。 */
-static void key_power_status_set(powerS_t new_status)
-{
-	if(power.status == new_status)
-	{
-		return;
-	}
-
-	power.status = new_status;
-	if(new_status == POWER_OFF)
-	{
-		/* 关机时先断连并停广播，再执行外围关断。 */
-		/* 关机前主动保存关键参数到Flash，减少突发断电丢数据风险。 */
-		Iap_Write();
-		ns_ble_disconnect();
-		ns_ble_adv_stop();
-		key_power_hw_shutdown();
-	}
-		else if(new_status == POWER_ON)
-	{
-		/* 开机后先释放 STDBY，再恢复广播，避免外围仍在待机态 */
-		NU1680_STDBY_CLR;
-		ns_ble_adv_start();
-	}
-}
 
 void Key_Init(void)
 {
@@ -101,11 +50,11 @@ void Key_Task0(void)
 		{
 			if(power.status != POWER_OFF)
 			{
-				key_power_status_set(POWER_OFF);
+				app_sys_power_set(POWER_OFF);
 			}
 			else if(power.status == POWER_OFF)
 			{
-				key_power_status_set(POWER_ON);
+				app_sys_power_set(POWER_ON);
 				aroma.en = ON;
 			}
 			power.onTime = 0;
@@ -121,7 +70,7 @@ void Key_Task0(void)
 			key.status = KEY_IDLE;
 			if(power.status != POWER_OFF)
 			{
-				key_power_status_set(POWER_OFF);
+				app_sys_power_set(POWER_OFF);
 			}
 		}
 		else
@@ -159,4 +108,7 @@ void Key_Task0(void)
 void KeySleepSet(void)
 {
 }
+
+
+
 

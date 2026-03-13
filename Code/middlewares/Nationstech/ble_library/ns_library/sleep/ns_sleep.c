@@ -262,7 +262,7 @@ void entry_idle(void)
 void ns_sleep(void)
 {
         /* 关机睡眠判定直接读取 DC_IN，避免 bat.status 旧值阻塞休眠 */
-    if((ns_sleep_lock != 0) || (power.status == POWER_ON) || (!POWER_KEY_GET) || (DC_IN_GET))
+    if((ns_sleep_lock != 0) || (power.status == POWER_ON) || (!POWER_KEY_GET) || (CHARGING_GET))
     {
         return;
     }
@@ -270,10 +270,7 @@ void ns_sleep(void)
     app_sleep_prepare_proc();
 
     GLOBAL_INT_DISABLE();
-
-//	SysTick->CTRL &= ~(SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
-//	TIM_Enable(TIM3, DISABLE);
-
+		
     switch(rwip_sleep())
     {
         case RWIP_DEEP_SLEEP:
@@ -325,16 +322,11 @@ void ns_sleep(void)
     app_sleep_resume_proc(); 
 		
 	/* 仅在需要运行态任务时恢复 ADC 时钟。 */
-	if((power.status == POWER_ON) || (DC_IN_GET) || (!POWER_KEY_GET))
+	if((power.status == POWER_ON) || (CHARGING_GET) || (!POWER_KEY_GET))
 	{
 		RCC_ADC_Configuration();
 		ADC_EnableBypassFilter(ADC, ENABLE);
 	}
-		
-//	SysTick->CTRL |= (SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
-//	TIM_Enable(TIM3, ENABLE);
-		
-
 }
 
 /**

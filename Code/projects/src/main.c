@@ -40,6 +40,8 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "main.h"
+#include "app_ota_feature.h"
+#include "app_sys.h"
 
 #if  (CFG_APP_NS_IUS)
 #include "ns_dfu_boot.h"
@@ -109,7 +111,6 @@ int main(void)
     }
     #endif
     app_ble_init();
-    
     NS_LOG_INFO(DEMO_STRING);
 
     // periph init 
@@ -126,6 +127,7 @@ int main(void)
 
 		Qflash_Init();
 		Iap_Read();
+		app_ota_feature_init();
 		/* 需求：每次上电后默认进入运行状态，不沿用上次关机时的开关态。 */
 		aroma.en = ON;
 	
@@ -159,7 +161,7 @@ void app_sleep_prepare_proc(void)
 	GPIO_InitType GPIO_InitStructure;
 	
 	/* 仅在逻辑关机状态下准备深睡，避免误触发休眠流程。 */
-	if((power.status == POWER_ON) || (!POWER_KEY_GET) || (power.offTime < 20)) return;
+	if((power.status == POWER_ON) || (!POWER_KEY_GET) || (power.offTime < 20) || (CHARGING_GET)) return;
 		
 	ke_timer_clear(APP_5MS_EVT, TASK_APP);
 	ke_timer_clear(APP_20MS_EVT, TASK_APP);
@@ -169,29 +171,11 @@ void app_sleep_prepare_proc(void)
 //	LedOff(LED1_PORT,LED1_PIN);
 //	LedOff(LED2_PORT,LED2_PIN);
 
-	/* 睡前先强制关闭外部负载，避免外围器件残留耗电。 */
-	EN_6291_CLR;
-	/* 关机态强制 NU1680 进入待机，避免 STDBY 悬空导致残留电流 */
-	NU1680_STDBY_SET;
-	airpump_pwm_force_off();
-	WF433_EN_SW_SET;
-	LED_RED_SET;
-	LED_GREEN_SET;
-	LED_BLUE_SET;
-	LED_COM1_CLR;
-	LED_COM2_CLR;
-	if(DC_IN_GET)
-	{
-		EN_WSL2309_SET;
-	}
-	else
-	{
-		EN_WSL2309_CLR;
-	}
-	aroma.en = OFF;
-	airpump.SW = 0;
-	fan.SW = OFF;
+	/* 睡前统一收口关机态外设输出。 */
+	app_sys_power_apply_off_outputs();
 
+	ADC_Enable(ADC, DISABLE);
+	RCC_EnableAHBPeriphClk(RCC_AHB_PERIPH_ADC, DISABLE);
 	RCC_Enable_ADC_CLK_SRC_AUDIOPLL(DISABLE);
 	
 	/* Configure PB.6 (ADC Channe5) as analog input --------*/
@@ -202,24 +186,15 @@ void app_sleep_prepare_proc(void)
 	 SysTick->CTRL &= ~(SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);	
 	  SysTick->LOAD = 0;
       SysTick->VAL  = 0;
-	/* 睡前关闭TIM3，避免PWM定时器继续运行带来额外电流。 */
+	/* 睡前关闭 TIM3，避免 PWM 定时器继续运行带来额外电流。 */
 	TIM_Enable(TIM3, DISABLE);
 	
-	ns_ble_disconnect();
-	for(uint8_t i=0; i<10; i++)
-	{
-		rwip_schedule();
-	}
-	
-	ns_ble_adv_stop();
-	for(uint8_t i=0; i<10; i++)
-	{
-		rwip_schedule();
-	}
-	
+	/* 睡眠入口只保留入睡相关动作，BLE断连/停广播在关机状态切换时一次性完成。 */
+
 	
 	/*Initialize key as external line interrupt*/
 	KeyInputExtiInit(KEY_INPUT_PORT, KEY_INPUT_PIN, ENABLE);
+	ChargingInputExtiInit(ENABLE);
 	
 	power.sleepAllow = 1;
 }
@@ -237,12 +212,10 @@ void app_sleep_resume_proc(void)
 	bool need_runtime_recover;
 	if(!power.sleepAllow) return;
 	
-	/* 仅在需要进入运行态时恢复系统节拍和任务定时器。 */
-		/* 直接读 DC_IN，避免 bat.status 滞后导致误判“充电中”而反复拉起运行态 */
-	need_runtime_recover = (power.status == POWER_ON) || (!POWER_KEY_GET) || (DC_IN_GET);
-	
-//    /* enable ADC 4M clock */
-//    RCC_Enable_ADC_CLK_SRC_AUDIOPLL(ENABLE);
+	/* 根据唤醒源决定是否恢复系统运行态与软件定时器。 */
+		/* 直接按 DC_IN 判断是否恢复到运行态或关机充电显示态。 */
+	/* PA6 当前按“正在充电”语义参与恢复判断，而非单纯插电存在。 */
+	need_runtime_recover = (power.status == POWER_ON) || (!POWER_KEY_GET) || (CHARGING_GET);
 	
 	/* Configure PB.6 (ADC Channe5) as analog input --------*/
 	GPIO_InitStructure.Pin       = GPIO_PIN_6;
@@ -251,9 +224,9 @@ void app_sleep_resume_proc(void)
 	
 		if(need_runtime_recover)
 	{
-		/* 需要运行态时释放 STDBY，恢复外设工作 */
+		/* 需要恢复运行态时释放 STDBY，并恢复外设工作。 */
 		NU1680_STDBY_CLR;
-		/* 唤醒后恢复软件定时任务。 */
+		/* 唤醒后恢复软件定时器。 */
 		ke_timer_set(APP_5MS_EVT, TASK_APP, 5);
 		ke_timer_set(APP_20MS_EVT, TASK_APP, 20);
 		ke_timer_set(APP_100MS_EVT, TASK_APP, 100);
@@ -261,6 +234,7 @@ void app_sleep_resume_proc(void)
 		ke_timer_set(APP_1S_EVT, TASK_APP, 1000);
 		
 		KeyInputExtiInit(KEY_INPUT_PORT, KEY_INPUT_PIN, DISABLE);
+		ChargingInputExtiInit(DISABLE);
 		
 		SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock/SYSTICK_100US);
@@ -269,13 +243,13 @@ void app_sleep_resume_proc(void)
 	}
 	else
 	{
-		/* 不需要运行态时保持 NU1680 待机，抑制关机残流 */
+		/* 不需要恢复运行态时，保持 NU1680 待机控制。 */
 		NU1680_STDBY_SET;
-		/* 保持最小唤醒状态，避免重新拉起高频任务。 */
+		/* 保持最小运行状态时，不恢复系统时钟节拍。 */
 		SysTick->CTRL &= ~(SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
 		SysTick->LOAD = 0;
 		SysTick->VAL  = 0;
-		/* 睡前关闭TIM3，避免PWM定时器继续运行带来额外电流。 */
+		/* 睡前关闭 TIM3，避免 PWM 定时器继续运行带来额外电流。 */
 	TIM_Enable(TIM3, DISABLE);
 	}
 
@@ -283,7 +257,7 @@ void app_sleep_resume_proc(void)
 	power.sleepAllow = 0;
 	power.offTime = 0;
 	
-	/* 广播只应在开机状态下启动。 */
+	/* 广播只应在开机状态下恢复。 */
 	if(power.status == POWER_ON)
 	{
 		ns_ble_adv_start();
@@ -300,5 +274,13 @@ void app_sleep_resume_proc(void)
 /**
  * @}
  */
+
+
+
+
+
+
+
+
 
 

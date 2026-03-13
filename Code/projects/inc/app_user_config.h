@@ -99,6 +99,14 @@
 #define CFG_PRF_BASS            1 
 #define CFG_PRF_RDTSS_16BIT     1
 
+#ifndef APP_NV_STORE_ENABLE
+#define APP_NV_STORE_ENABLE      0
+#endif
+
+
+#ifndef APP_OTA_FEATURE_ENABLE
+#define APP_OTA_FEATURE_ENABLE  0
+#endif
 
 #ifdef BLE_OTA_ENABLE
 #define CFG_APP_NS_IUS          1
@@ -121,4 +129,6 @@
 
 
 #endif // _APP_USER_CONFIG_H_
+
+
 

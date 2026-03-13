@@ -96,6 +96,14 @@ void airpump_pwm_force_off(void)
 	airpump_pwm_set_duty_permille(0U);
 }
 
+/* 彻底关闭气泵输出：既关PWM，也将PB5切回GPIO低电平。 */
+void airpump_force_off(void)
+{
+	airpump_pwm_force_off();
+	airpump_gpio_set_output(false);
+	airpump.SW = 0;
+}
+
 /* 初始化PB5为TIM3_CH2硬件PWM输出，仅初始化一次。 */
 static void airpump_pwm_init(void)
 {
@@ -488,6 +496,9 @@ operationCountS_t airpump_operation_count_status(uint16_t workTime, uint16_t pau
 	
 	return S_NORMAL;
 }
+
+
+
 
 
 
