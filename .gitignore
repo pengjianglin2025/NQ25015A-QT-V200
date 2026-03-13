@@ -1,56 +1,53 @@
-# General
-.DS_Store
-Thumbs.db
-*.tmp
-*.bak
-*.log
-*.lock
-
-# IDE / editor
+# Keil MDK-ARM user/build artifacts
+Code/projects/MDK-ARM/Objects/
+Code/projects/MDK-ARM/Listings/
+Code/projects/MDK-ARM/bin/
+Code/projects/MDK-ARM/*.uvoptx
+Code/projects/MDK-ARM/*.uvguix.*
+Code/projects/MDK-ARM/JLinkLog.txt
+Code/projects/MDK-ARM/JLinkSettings.ini
 .vscode/
-
-# Keil / uVision generated files
+**/.vscode/
 **/Objects/
 **/Listings/
 **/bin/
-**/*.uvguix.*
 **/*.uvoptx
-**/*.axf
-**/*.bin
-**/*.hex
-**/*.map
-**/*.htm
-**/*.dep
-**/*.crf
-**/*.d
-**/*.o
-**/*.lnp
-**/*.sct
-
-# Debug / programming tool artifacts
+**/*.uvguix.*
 **/JLinkLog.txt
 **/JLinkSettings.ini
-**/uv4.log
-**/uv4.log.lock
 
+# Common binary packages and tools
+*.exe
+*.dll
+*.apk
+*.zip
+*.obj
+*.axf
+*.bin
+*.hex
 
-Doc/JLink_V892.zip
+# Sensitive files
+*.pem
+*private_key*
 
+# DFU generated/output folders
+Code/**/utilities/dfu/keys/
+Code/**/utilities/dfu/NSAndroidUtil/
+Code/**/utilities/dfu/NSUtil/
+Code/**/utilities/dfu/NSpyocd/
+Code/**/utilities/dfu/Image/**/Image/
+Code/**/utilities/dfu/JLink/JLink_V632/
+**/utilities/dfu/keys/
+**/utilities/dfu/NSAndroidUtil/
+**/utilities/dfu/NSUtil/
+**/utilities/dfu/NSpyocd/
+**/utilities/dfu/Image/
+**/utilities/dfu/JLink/
+
+# BLE symbol output
+Code/**/middlewares/Nationstech/ble_library/ns_ble_stack/symdef/
+**/middlewares/Nationstech/ble_library/ns_ble_stack/symdef/
+
+# Local docs and exports
 Doc/JLink_V892/
-
-Code/utilities/dfu/JLink/
-Code/utilities/dfu/NSUtil/
-Code/utilities/dfu/NSpyocd/
-Code/utilities/dfu/NSAndroidUtil/
-
-Code/utilities/dfu/Image/
-Code/utilities/dfu/keys/private_key.pem
-
-Code/20260305/utilities/dfu/JLink/
-Code/20260305/utilities/dfu/NSUtil/
-Code/20260305/utilities/dfu/NSpyocd/
-Code/20260305/utilities/dfu/NSAndroidUtil/
-Code/20260305µÍ¹¦ºÄok/utilities/dfu/JLink/
-Code/20260305µÍ¹¦ºÄok/utilities/dfu/NSUtil/
-Code/20260305µÍ¹¦ºÄok/utilities/dfu/NSpyocd/
-Code/20260305µÍ¹¦ºÄok/utilities/dfu/NSAndroidUtil/
+CirCuit/*.htm
