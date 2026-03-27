@@ -1,0 +1,52 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/fix_reconnect3.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/fix_reconnect4.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/fix_reconnect5.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/fix_connected_branch.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/verify_fix.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/verify_fix2.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_loading.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_getvaluechange.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_services.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_showloading.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_getservices.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/find_getservices_func.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_setmtu.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/find_setmtu_func.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_appvue.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_appvue2.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_changedata.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/analyze_bleloading.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/fix_connected_v2.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/verify_v2.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Expand-Archive -Path ''E:/project_QT/QT_Aroma_Android/香薰机.zip'' -DestinationPath ''C:/Users/Pjl/aroma_orig'' -Force; Write-Host ''Done''\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory\\(''E:/project_QT/QT_Aroma_Android/香薰机.zip'', ''C:/Users/Pjl/aroma_orig''\\)\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"ls ''C:/Users/Pjl/aroma_orig/''\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \":*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/extract_orig.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/extract_orig2.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/extract_orig3.ps1\")",
+      "Bash(where 7z)",
+      "Bash(where winrar:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Get-ChildItem ''C:\\\\Users\\\\Pjl\\\\aroma_extracted\\\\bledeviceDetail\\\\'' | Select-Object Name,Length\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/extract_v5.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/extract_v6.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/check_methods.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/decrypt_zip2.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/fix_timing.ps1\")",
+      "Bash(grep -n \"</template>\\\\|</view>$\\\\|^<script\\\\|data\\(\\) {\\\\|bleDeviceId\\\\|writeData\\\\|getValueChange\\\\|notifyBLE\" \"E:/project_QT/QT_Aroma_Android/aroma/pages/blemodule/bledeviceDetail/ivy07index.vue\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/search_dpid.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/find_changedata.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/find_filtercurmode.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/find_pageparams.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/find_mode_params.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/find_hexstr.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/find_hexstr2.ps1\")"
+    ],
+    "additionalDirectories": [
+      "E:\\project_NQ\\NQ25015A（QT-V200）\\Code\\projects\\user"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "Read(//e/project_NQ/NQ25015A（QT-V200）/**)",
+      "Bash(find E:/project_NQ/NQ25015A（QT-V200）/Code/middlewares -name ns_dfu_boot*)",
+      "Bash(python3 \"C:\\\\Users\\\\Pjl\\\\AppData\\\\Local\\\\Temp\\\\fix_scatter.py\")",
+      "Bash(py \"C:\\\\Users\\\\Pjl\\\\AppData\\\\Local\\\\Temp\\\\fix_scatter.py\")",
+      "Bash(where python:*)",
+      "Bash(where python3:*)",
+      "Bash(where py:*)",
+      "Bash(cmd /c \"where python\")",
+      "Bash(cmd /c \"python --version\")",
+      "Bash(cmd /c \"python C:\\\\Users\\\\Pjl\\\\AppData\\\\Local\\\\Temp\\\\fix_scatter.py\")",
+      "Read(//e/project_QT/QT_Aroma_Android/aroma/**)",
+      "Bash(find E:/project_QT/QT_Aroma_Android/aroma/pages -type f -name *.vue)",
+      "Bash(powershell -File \"C:/Users/Pjl/tmp_fix.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Users/Pjl/tmp_fix.ps1\")"
+    ],
+    "additionalDirectories": [
+      "E:\\project_QT\\QT_Aroma_Android\\aroma\\pages\\blemodule\\ota",
+      "E:\\project_NQ\\NQ25015A（QT-V200）\\Code\\projects\\inc",
+      "E:\\project_QT\\QT_Aroma_Android\\aroma\\pages\\blemodule\\setting",
+      "C:\\Users\\Pjl"
+    ]
+  }
+}
