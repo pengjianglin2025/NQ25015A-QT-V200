@@ -2,6 +2,8 @@
 #include "mkey.h"
 #include "led.h"
 #include "app_ota_feature.h"
+#include "iap.h"
+
 
 const eventParameter_t NetDateInit[5] = {{0,0,0,0,0,0,0,0x7f,1,0},
 																 {0,0,0,0,0,0,0,0x7f,1,0},
@@ -12,20 +14,28 @@ const eventParameter_t NetDateInit[5] = {{0,0,0,0,0,0,0,0x7f,1,0},
 const char ConncetMode[70] = "{\"p\":\"p11r26_MVZ4NjdLR3F0VUUv\",\"v\":\"1.0.0\",\"tslid\":0,\"m\":0,\"mt\":3}"; 
 
 uint16_t RxCnt = 0,TxCnt = 0;
-uint16_t TxTotalLength=0;  //·¢ËÍ×Ö·û´®µÄ×Ü³¤¶È
-uint16_t RxTotalLength=0;  //½ÓÊÕ×Ö·û´®µÄ×Ü³¤¶È
-uint16_t ReceiveIdleCount = 0,SendIdleCount = 0;  //´®¿Ú½ÓÊÕ,·¢ËÍÏÐÖÃÊ±¼ä
+uint16_t TxTotalLength=0;  //ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü³ï¿½ï¿½ï¿½
+uint16_t ReceiveIdleCount = 0,SendIdleCount = 0;  //ï¿½ï¿½ï¿½Ú½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
 uint16_t	LocalCheckSum = 0;
-uint8_t RXLength;            //½ÓÊÕÊý¾Ý³¤¶È
-bool RXFinishFlag;       //½ÓÊÕÍê³É±êÖ¾
-bool RXStartFlag;        //½ÓÊÕÆðÊ¼±êÖ¾
 
 upData_t upData;
 net_t net;
-Message_t Rx,Tx;
+/* ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ protocol.c ï¿½Ú²ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½â²¿Í¨ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ Buffer Ö¸ï¿½ë¡£ */
+static Message_t Rx;
+/* ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ protocol.c ï¿½Ú²ï¿½Ê¹ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¿Ú¿É¼ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Õ¡ï¿½ */
+static Message_t Tx;
 Link_t NetLinkStatus;
+
+uint8_t* protocol_rx_buffer_get(void)
+{
+	return Rx.Buffer;
+}
+
+uint16_t protocol_rx_buffer_size_get(void)
+{
+	return (uint16_t)sizeof(Rx.Buffer);
+}
 //volatile eventParameter_t NetEvent[5];
-uint16_t CrcCheck;
 																 
 											
 void Module_Config(void)
@@ -41,6 +51,7 @@ void Module_Reset(void)
 	upData.ModuleReset = 1;
 }			 
 
+/* ï¿½ï¿½ï¿½ï¿½Ç°Ð­ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ BLE notify ï¿½ï¿½ï¿½ï¿½ Appï¿½ï¿½ */
 void UARTTxData(uint16_t Length)
 {
 	uint16_t i;
@@ -55,7 +66,7 @@ void UARTTxData(uint16_t Length)
 	Tx.Length_H = len.BYTE1;  
 	Tx.Length_L = len.BYTE0; 
 	
-	/**************Ö¡¼ìÑéÂë****************/
+	/**************Ö¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½****************/
 	for (i=0; i<(len.WORD+6); i++) { LocalCheckSum += Tx.Buffer[i]; }
 	Tx.Buffer[len.WORD+6] = LocalCheckSum%256;
 	
@@ -65,27 +76,41 @@ void UARTTxData(uint16_t Length)
 	rdtss_16bit_send_notify((uint8_t*)Tx.Buffer, TxTotalLength);
 }
 
+/* ï¿½ï¿½ Rx.Buffer ï¿½Ð½ï¿½ï¿½ï¿½Ò»Ö¡ï¿½ï¿½ï¿½ï¿½Ð­ï¿½é£¬ï¿½ï¿½ï¿½Ñ½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ DP Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 void app_data_parse_task(void)
 {
 	RTC_DateType colckDataTemp;
 	RTC_TimeType colckTimeTemp;
 	uint16_t DataLenght;
+	uint16_t DpLength;
 	uint8_t i,j,n,CheckSumTemp;
 	uint16To2_t TempA;
 	
+	/* net.HaveNewRxData ï¿½É»ï¿½ï¿½Î¶ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¡ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ */
 	if(net.HaveNewRxData)// && (ReceiveIdleCount > INTERVAL_TIME))
 	{
 		
 		LocalCheckSum = 0;
 		CheckSumTemp = 0;
+		/* ï¿½ï¿½ï¿½ï¿½Ö¡Í·ï¿½Í°æ±¾Ð£ï¿½é£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½Ð¶Ï¡ï¿½ */
 		if((Rx.Head1 == HEAD1) && (Rx.Head2 == HEAD2) && (Rx.Version == RECEIVE_VERSION))
 		{
+			/* Length ï¿½ï¿½Ê¾ï¿½ï¿½ Command/DP ï¿½ï¿½Ê¼ï¿½ï¿½ payload ï¿½ï¿½ï¿½Ü³ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½Ð£ï¿½ï¿½ï¿½Ö½Ú¡ï¿½ */
 			DataLenght = Rx.Length_H*256 + Rx.Length_L;
+			if(DataLenght > (PROTOCOL_DATA_MAX - 7))
+			{
+				TxCnt = 0;
+				net.HaveNewRxData = 0;
+				RxCnt = 0;
+				memset(Rx.Buffer,0,sizeof(Rx.Buffer));
+				return;
+			}
 			
       for(i=0; i<DataLenght+6; i++) { LocalCheckSum += Rx.Buffer[i]; }
 			CheckSumTemp = LocalCheckSum%256;
 			
 			
+			/* Ð£ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½Å½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½Ð´Òµï¿½ï¿½×´Ì¬ï¿½ï¿½ */
 			if(CheckSumTemp == Rx.Buffer[DataLenght+6])
 			{
 				net.dataReceiveFlag = 1;
@@ -138,6 +163,8 @@ void app_data_parse_task(void)
 					}break;
 					case 0x06:
 					{
+						/* 0x06 ï¿½ï¿½ DP ï¿½Â·ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ DP ï¿½ï¿½ï¿½Ý³ï¿½ï¿½È£ï¿½ï¿½Ù°ï¿½ DP_ID ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+						DpLength = Rx.DP_Len_H*256 + Rx.DP_Len_L;
 						switch(Rx.DP_ID)
 						{
 							case 1: { 
@@ -169,6 +196,8 @@ void app_data_parse_task(void)
 							}break;
 							case 18: 
 							{ 
+								/* ×¨ÒµÄ£Ê½ 5 ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½ 55 ï¿½Ö½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ */
+								if(DpLength != 55) { break; }
 								n = 0;
 								for(i=0; i<5; i++)
 								{
@@ -193,26 +222,32 @@ void app_data_parse_task(void)
 							}break;
 							case 20: 
 							{ 
-//								n = 0;
-//								TempA.BYTE1 = Rx.DP_Data[n++];
-//								TempA.BYTE0 = Rx.DP_Data[n++];
-//								oil.totalVolume =  TempA.WORD;
-//								TempA.BYTE1 = Rx.DP_Data[n++];
-//								TempA.BYTE0 = Rx.DP_Data[n++];
-//								oil.curretVolume =  TempA.WORD;
-//								oil.defaultConsumeSpeed =  Rx.DP_Data[n++];
-//								TempA.BYTE1 = Rx.DP_Data[n++];
-//								TempA.BYTE0 = Rx.DP_Data[n++];
-////								oil.surplusDay =  TempA.WORD;
-//								oil.actualConsumeSpeed =  Rx.DP_Data[n++];
-////								upData.DPID020Back = 1;  
+								/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½Ç°ï¿½ï¿½/Ä¬ï¿½ï¿½ï¿½Íºï¿½/Ê£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/Êµï¿½ï¿½ï¿½ÍºÄ¡ï¿½ */
+								if(DpLength != 8) { break; }
+								n = 0;
+								TempA.BYTE1 = Rx.DP_Data[n++];
+								TempA.BYTE0 = Rx.DP_Data[n++];
+								oil.totalVolume =  TempA.WORD;
+								TempA.BYTE1 = Rx.DP_Data[n++];
+								TempA.BYTE0 = Rx.DP_Data[n++];
+								oil.curretVolume =  TempA.WORD;
+								oil.defaultConsumeSpeed =  Rx.DP_Data[n++];
+								TempA.BYTE1 = Rx.DP_Data[n++];
+								TempA.BYTE0 = Rx.DP_Data[n++];
+								oil.surplusDay =  TempA.WORD;
+								oil.actualConsumeSpeed =  Rx.DP_Data[n++];
+								upData.DPID020Back = 1;  
 							}break;
 							case 24: { upData.DPID024Back = 1;  }break;
 							case 25: { 
-							aroma.parameterMode = Rx.DP_Data[0];  }break;
+							aroma.parameterMode = Rx.DP_Data[0];
+							upData.DPID025Back = 1;
+							}break;
 							case 26: { upData.DPID026Back = 1;  }break;
 							case 27: 
 							{ 
+								/* ï¿½ï¿½Ä£Ê½ï¿½ï¿½Ê±ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ + ï¿½ï¿½Ç°ï¿½ï¿½Î»ï¿½ï¿½ */
+								if(DpLength != 3) { break; }
 								n = 0;
 								TempA.BYTE1 = Rx.DP_Data[n++];
 								TempA.BYTE0 = Rx.DP_Data[n++];
@@ -266,6 +301,7 @@ void app_data_parse_task(void)
 	}
 	
 }
+/* ï¿½ï¿½ upData ï¿½ï¿½Ö¾Î»ï¿½ï¿½ï¿½è±¸×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ï¿½ï¿½ Appï¿½ï¿½ */
 void app_data_up_task(void)
 {
 	static uint8_t CntA,CntB;
@@ -278,6 +314,7 @@ void app_data_up_task(void)
 		net.LinkStatusOld = net.LinkStatus;
 		if(net.LinkStatus != 0x04){net.GetTimeAlready = 0;}
 	}
+	/* ï¿½è±¸Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»Ð£Ê±ï¿½ï¿½ï¿½Í°ï¿½ï¿½Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ App ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä¡£ */
 	if(!net.GetTimeAlready)
 	{
 		if(net.LinkStatus == 0x04) 
@@ -388,59 +425,36 @@ void app_data_up_task(void)
 		}
 		else if(upData.DPID017Back)
 		{
-			Tx.CommandWord = 0x07; Tx.DP_ID = 17; Tx.DP_Type = 0x01; Length.WORD = 1; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0; 
-//			Tx.DP_Data[0] = oil.armalFlag;
-			
+			Tx.CommandWord = 0x07; Tx.DP_ID = 17; Tx.DP_Type = 0x01; Length.WORD = 1; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0;
+			Tx.DP_Data[0] = oil.armalFlag;
+
 			UARTTxData(5);
 			upData.DPID017Back = 0;
 		}
-		else if(upData.DPID018Back)
-		{
-			Tx.CommandWord = 0x07; Tx.DP_ID = 18; Tx.DP_Type = 0x00; Length.WORD = 55; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0; 
-			
-			n = 0;
-			for(i=0; i<5; i++)
-			{
-				Tx.DP_Data[n++] = i;
-				Tx.DP_Data[n++] = runEvent[i].weekEn.BYTE;
-				Tx.DP_Data[n++] = runEvent[i].startTimeHour;
-				Tx.DP_Data[n++] = runEvent[i].startTimeMinutes;
-				Tx.DP_Data[n++] = runEvent[i].stopTimeHour;
-				Tx.DP_Data[n++] = runEvent[i].stopTimeMinutes;
-				Tx.DP_Data[n++] = runEvent[i].en;
-				TempA.WORD = runEvent[i].workTime;
-				Tx.DP_Data[n++] = TempA.BYTE1;
-				Tx.DP_Data[n++] = TempA.BYTE0;
-				TempA.WORD = runEvent[i].pauseTime;
-				Tx.DP_Data[n++] = TempA.BYTE1;
-				Tx.DP_Data[n++] = TempA.BYTE0;
-			}
-			
-			UARTTxData(59);
-			upData.DPID018Back = 0;
-		}
 		else if(upData.DPID020Back)
 		{
+			/* DP20 ï¿½Ï±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ App ï¿½ï¿½Ò³Ö¸ï¿½ê¿¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½Ê¹ï¿½Ã¡ï¿½ */
 			Tx.CommandWord = 0x07; Tx.DP_ID = 20; Tx.DP_Type = 0x00; Length.WORD = 8; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0; 
 			
-//			n = 0;
-//			TempA.WORD = oil.totalVolume;
-//			Tx.DP_Data[n++] = TempA.BYTE1;
-//			Tx.DP_Data[n++] = TempA.BYTE0;
-//			TempA.WORD = oil.curretVolume;
-//			Tx.DP_Data[n++] = TempA.BYTE1;
-//			Tx.DP_Data[n++] = TempA.BYTE0;
-//			Tx.DP_Data[n++] = oil.defaultConsumeSpeed;
-//			TempA.WORD = oil.surplusDay;
-//			Tx.DP_Data[n++] = TempA.BYTE1;
-//			Tx.DP_Data[n++] = TempA.BYTE0;
-//			Tx.DP_Data[n++] = oil.actualConsumeSpeed;
+			n = 0;
+			TempA.WORD = oil.totalVolume;
+			Tx.DP_Data[n++] = TempA.BYTE1;
+			Tx.DP_Data[n++] = TempA.BYTE0;
+			TempA.WORD = oil.curretVolume;
+			Tx.DP_Data[n++] = TempA.BYTE1;
+			Tx.DP_Data[n++] = TempA.BYTE0;
+			Tx.DP_Data[n++] = oil.defaultConsumeSpeed;
+			TempA.WORD = oil.surplusDay;
+			Tx.DP_Data[n++] = TempA.BYTE1;
+			Tx.DP_Data[n++] = TempA.BYTE0;
+			Tx.DP_Data[n++] = oil.actualConsumeSpeed;
 			
 			UARTTxData(12);
 			upData.DPID020Back = 0;
 		}
 		else if(upData.DPID022Back)
 		{
+			/* DP22 ï¿½Ï±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½App ï¿½ï¿½Ý´Ë¾ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ð©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¡ï¿½ */
 			Tx.CommandWord = 0x07; Tx.DP_ID = 22; Tx.DP_Type = 0x00; Length.WORD = 7; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0; 
 			
 			n = 0;
@@ -514,8 +528,8 @@ void app_data_up_task(void)
 		}
 		else if(upData.DPID027Back)
 		{
-			Tx.CommandWord = 0x07; Tx.DP_ID = 27; Tx.DP_Type = 0x00; Length.WORD = 3; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0; 
-			
+			Tx.CommandWord = 0x07; Tx.DP_ID = 27; Tx.DP_Type = 0x00; Length.WORD = 3; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0;
+
 			n = 0;
 			TempA.WORD = aroma.timeLeft;
 			Tx.DP_Data[n++] = TempA.BYTE1;
@@ -524,6 +538,39 @@ void app_data_up_task(void)
 			UARTTxData(7);
 			upData.DPID027Back = 0;
 		}
+		else if(upData.DPID018Back)
+		{
+			/* DPID018 payload=66 bytes, needs MTU>=69. Moved last so DPID020-027
+			   are always sent first. ble_att_mtu is updated by notification confirms
+			   and equals (negotiated_mtu - 3); default=20, after setBLEMTU(256)=253. */
+			extern uint16_t ble_att_mtu;
+			if(ble_att_mtu >= 66)
+			{
+				Tx.CommandWord = 0x07; Tx.DP_ID = 18; Tx.DP_Type = 0x00; Length.WORD = 55; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0;
+
+				n = 0;
+				for(i=0; i<5; i++)
+				{
+					Tx.DP_Data[n++] = i;
+					Tx.DP_Data[n++] = runEvent[i].weekEn.BYTE;
+					Tx.DP_Data[n++] = runEvent[i].startTimeHour;
+					Tx.DP_Data[n++] = runEvent[i].startTimeMinutes;
+					Tx.DP_Data[n++] = runEvent[i].stopTimeHour;
+					Tx.DP_Data[n++] = runEvent[i].stopTimeMinutes;
+					Tx.DP_Data[n++] = runEvent[i].en;
+					TempA.WORD = runEvent[i].workTime;
+					Tx.DP_Data[n++] = TempA.BYTE1;
+					Tx.DP_Data[n++] = TempA.BYTE0;
+					TempA.WORD = runEvent[i].pauseTime;
+					Tx.DP_Data[n++] = TempA.BYTE1;
+					Tx.DP_Data[n++] = TempA.BYTE0;
+				}
+
+				UARTTxData(59);
+			}
+			upData.DPID018Back = 0;
+		}
+
 //	}
 }
 

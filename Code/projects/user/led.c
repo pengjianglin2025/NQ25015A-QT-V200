@@ -43,7 +43,7 @@ void Led_Task(void)
 {
 	static uint16_t cntA;
 	
-	if(power.status == POWER_ON)
+	if(power.state == POWER_ON)
 	{
 //		ledS.RED1 = LEDS_ON; ledS.GREEN1 = LEDS_OFF; ledS.BLUE1 = LEDS_OFF;
 //		ledS.RED2 = LEDS_ON; ledS.GREEN2 = LEDS_OFF; ledS.BLUE2 = LEDS_OFF;

@@ -62,7 +62,7 @@ void BAT_Task(void)
 	uint16_t ResultBuf[10];
 	float tempA;
 	
-	if((power.status != POWER_OFF) && (bat.status == BAT_DISCHARGE))
+	if((power.state != POWER_OFF) && (bat.status == BAT_DISCHARGE))
 	{
 		tempA =  ADC_ConverValueToVoltage(ADC_Converse(ADC_CTRL_CH_5, 10 ,ResultBuf), ADC_CTRL_CH_5);
 		bat.volage = (uint16_t)(tempA * 1.13);
@@ -126,16 +126,16 @@ void BAT_Task(void)
 	}
 
 	
-	if(CHARGING_GET)
+	if(CHARGE_ACTIVE_LEVEL_GET)
 	{
 //		PowerOffTime = 0;
 		cntB = 0;
-		if(power.status == POWER_OFF)
+		if(power.state == POWER_OFF)
 		{
 			cntA = 0;
 			if(bat.status != BAT_CHARGE)
 			{
-				bat.status = BAT_CHARGE; EN_WSL2309_SET;
+				bat.status = BAT_CHARGE; CHARGE_CTRL_EN_SET;
 				bat.volRange = VOLTAGE_RANGE1;
 			}
 		}
@@ -144,7 +144,7 @@ void BAT_Task(void)
 			cntA = 0;
 			if(bat.status != BAT_CHARGE)
 			{
-				bat.status = BAT_CHARGE; EN_WSL2309_SET;
+				bat.status = BAT_CHARGE; CHARGE_CTRL_EN_SET;
 				bat.volRange = VOLTAGE_RANGE1;
 			}
 		}
@@ -158,7 +158,7 @@ void BAT_Task(void)
 			if(bat.status != BAT_DISCHARGE)
 			{
 //				PowerOffTime = 0;
-				bat.status = BAT_DISCHARGE; EN_WSL2309_CLR;
+				bat.status = BAT_DISCHARGE; CHARGE_CTRL_EN_CLR;
 				bat.chargeFull = 0;
 				
 				if(bat.fullCnt > 300){bat.fullCnt -= 300;}
@@ -171,11 +171,11 @@ void BAT_Task(void)
 	{
 		if(airpump.SW) 
 		{
-			EN_WSL2309_CLR;
+			CHARGE_CTRL_EN_CLR;
 		}
 		else 
 		{
-			EN_WSL2309_SET;
+			CHARGE_CTRL_EN_SET;
 		}
 		
 //		if((!LED3_MONITOR) && (LED1_MONITOR))

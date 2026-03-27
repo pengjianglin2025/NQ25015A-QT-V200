@@ -71,7 +71,7 @@
 #define MIN_CONN_INTERVAL                   15                                         /**< Minimum connection interval (15 ms) */
 #define MAX_CONN_INTERVAL                   30                                         /**< Maximum connection interval (30 ms). */
 #define SLAVE_LATENCY                       0                                          /**< Slave latency. */
-#define CONN_SUP_TIMEOUT                    5000                                       /**< Connection supervisory timeout (5000ms). */
+#define CONN_SUP_TIMEOUT                    10000                                      /**< Connection supervisory timeout (10000ms). */
 
 #define FIRST_CONN_PARAMS_UPDATE_DELAY      (5000)                                     /**<  Time of initiating event to update connection params (5 seconds). */
 

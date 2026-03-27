@@ -41,6 +41,7 @@
 #include "ns_timer.h"
 #include "ke_timer.h"
 #include "app_ble.h"   
+#include "ringbuffer.h"
 
 #if (CFG_PRF_RDTSS)
 #include "rdtss_task.h" 
@@ -450,8 +451,9 @@ void app_usart_tx_process(void)
 //        {
 //            usart_tx_fifo_out = in_temp;
 //        }
-				memcpy(Rx.Buffer,p_data,len);
-				usart_tx_fifo_out = in_temp;
+				ringbuffer_putstr(&rb, p_data, (uint16_t)len);
+                ke_msg_send_basic(APP_PROTOCOL_RX_EVT, TASK_APP, TASK_APP);
+                usart_tx_fifo_out = in_temp;
     }
     else if(usart_tx_fifo_out > in_temp)
     {
@@ -461,8 +463,9 @@ void app_usart_tx_process(void)
 //        {
 //            usart_tx_fifo_out = 0;
 //        }
-				memcpy(Rx.Buffer,p_data,len);
-				usart_tx_fifo_out = 0;
+				ringbuffer_putstr(&rb, p_data, (uint16_t)len);
+                ke_msg_send_basic(APP_PROTOCOL_RX_EVT, TASK_APP, TASK_APP);
+                usart_tx_fifo_out = 0;
        
     }
 }

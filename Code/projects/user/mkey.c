@@ -37,10 +37,10 @@ void keyLock_status_set(keyLock_t sta)
 void Key_Task0(void)
 {
 	
-	if(!POWER_KEY_GET)
+	if(!POWER_KEY_LEVEL_GET)
 	{
 		key.idleCnt = 0;
-		power.offTime = 0;
+		power.powerOffTicks = 0;
 		
 		if(key.cnt == 5)
 		{
@@ -48,16 +48,16 @@ void Key_Task0(void)
 		}
 		else if(key.cnt == 200)
 		{
-			if(power.status != POWER_OFF)
+			if(power.state != POWER_OFF)
 			{
 				app_sys_power_set(POWER_OFF);
 			}
-			else if(power.status == POWER_OFF)
+			else if(power.state == POWER_OFF)
 			{
 				app_sys_power_set(POWER_ON);
 				aroma.en = ON;
 			}
-			power.onTime = 0;
+			power.powerOnTicks = 0;
 			remotePairingTime = 0;
 				
 			key.clickCnt = 0;//key.cnt = 2000;
@@ -68,7 +68,7 @@ void Key_Task0(void)
 		{
 			key.cnt = 2500;
 			key.status = KEY_IDLE;
-			if(power.status != POWER_OFF)
+			if(power.state != POWER_OFF)
 			{
 				app_sys_power_set(POWER_OFF);
 			}
@@ -87,7 +87,7 @@ void Key_Task0(void)
 			if(key.clickCnt == 3)
 			{
 				key.clickCnt = 0;
-				if(power.status == POWER_ON)//((PowerOnTime < 500) && (power.status == ON) && (bat.status != BAT_CHARGE))
+				if(power.state == POWER_ON)//((PowerOnTime < 500) && (power.state == ON) && (bat.status != BAT_CHARGE))
 				{
 					globalWorkState = MODE_RESET;
 				}
@@ -100,7 +100,7 @@ void Key_Task0(void)
 			key.status = KEY_IDLE;
 		}
 	}
-//	if(power.status) POWER_OUT_KEY = 1;
+//	if(power.state) POWER_OUT_KEY = 1;
 //		else POWER_OUT_KEY = 0;
 }
 

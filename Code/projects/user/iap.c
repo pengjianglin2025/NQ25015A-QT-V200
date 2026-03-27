@@ -2,11 +2,12 @@
 #include "app_user_config.h"
 #include "app_nv_store.h"
 
-Iap_t IapRead, IapWrite;
+Iap_t iapRead, IapWrite;
 uint8_t IapWriteEn = 0;
 
-#define FLASH_TEST_ADDRESS       0x01020000UL
+#define FLASH_TEST_ADDRESS       ((uint32_t)IAP_START_ADDR)
 #define BUFFER_SIZE              IAP_DATA_MAX
+
 
 /* 将当前运行参数整理成一份完整镜像，便于统一存盘。 */
 static void iap_build_runtime_image(Iap_t* image)
@@ -32,10 +33,10 @@ static void iap_build_runtime_image(Iap_t* image)
     image->FanEN = fan.en;
     image->workState = aroma.en;
     image->keyLockState = key.lockStatus;
-    image->curretVolume = oil.curretVolume;
-    image->consumeSpeed = oil.actualConsumeSpeed;
     image->rollingCode1 = RollingCode1;
     image->rollingCode2 = RollingCode2;
+    image->oilCurretVolume.WORD = oil.curretVolume;
+    image->oilConsumeSpeed.WORD = oil.actualConsumeSpeed;
 }
 
 /* 将 Flash 中保存的参数恢复到运行变量。 */
@@ -59,10 +60,28 @@ static void iap_restore_runtime_image(const Iap_t* image)
     fan.en = image->FanEN;
     aroma.en = image->workState;
     key.lockStatus = image->keyLockState;
-    oil.curretVolume = image->curretVolume;
-    oil.actualConsumeSpeed = image->consumeSpeed;
     RollingCode1 = image->rollingCode1;
     RollingCode2 = image->rollingCode2;
+
+    if((image->oilCurretVolume.WORD == 0U) && (image->oilConsumeSpeed.WORD == 0U))
+    {
+        oil.curretVolume = oil.totalVolume;
+        oil.actualConsumeSpeed = oil.defaultConsumeSpeed;
+    }
+    else
+    {
+        oil.curretVolume = image->oilCurretVolume.WORD;
+        oil.actualConsumeSpeed = image->oilConsumeSpeed.WORD;
+    }
+
+    if(oil.curretVolume > oil.totalVolume)
+    {
+        oil.curretVolume = oil.totalVolume;
+    }
+    if(oil.actualConsumeSpeed == 0U)
+    {
+        oil.actualConsumeSpeed = oil.defaultConsumeSpeed;
+    }
 }
 
 /* 启动时优先读取新参数区；若新参数区为空，则兼容旧地址并自动迁移。 */
@@ -100,9 +119,9 @@ static uint8_t iap_storage_write(const uint8_t* buffer, uint16_t size)
     {
         Qflash_Erase_Sector(FLASH_TEST_ADDRESS);
         Qflash_Write(FLASH_TEST_ADDRESS, (uint8_t*)buffer, size);
-        memset(IapRead.Buffer, 0, sizeof(IapRead.Buffer));
-        Qflash_Read(FLASH_TEST_ADDRESS, IapRead.Buffer, size);
-        if(memcmp(IapRead.Buffer + 1, buffer + 1, size - 1) == 0)
+        memset(iapRead.Buffer, 0, sizeof(iapRead.Buffer));
+        Qflash_Read(FLASH_TEST_ADDRESS, iapRead.Buffer, size);
+        if(memcmp(iapRead.Buffer, buffer, size) == 0)
         {
             return 1U;
         }
@@ -113,11 +132,11 @@ static uint8_t iap_storage_write(const uint8_t* buffer, uint16_t size)
 
 void Iap_Read(void)
 {
-    memset(IapRead.Buffer, 0, sizeof(IapRead.Buffer));
+    memset(iapRead.Buffer, 0, sizeof(iapRead.Buffer));
 
-    if(iap_storage_load(IapRead.Buffer, BUFFER_SIZE) && (IapRead.writeOk == IAP_WRITE_OK))
+    if(iap_storage_load(iapRead.Buffer, BUFFER_SIZE) && (iapRead.writeOk == IAP_WRITE_OK))
     {
-        iap_restore_runtime_image(&IapRead);
+        iap_restore_runtime_image(&iapRead);
     }
     else
     {
@@ -132,9 +151,18 @@ void Iap_Read(void)
 
 void Iap_Write(void)
 {
+    uint8_t storageValid;
+
     iap_build_runtime_image(&IapWrite);
-    (void)iap_storage_write(IapWrite.Buffer, BUFFER_SIZE);
-    (void)iap_storage_read_current(IapRead.Buffer, BUFFER_SIZE);
+    storageValid = iap_storage_write(IapWrite.Buffer, BUFFER_SIZE);
+    if(storageValid)
+    {
+        (void)iap_storage_read_current(iapRead.Buffer, BUFFER_SIZE);
+    }
+    else
+    {
+        memset(iapRead.Buffer, 0, sizeof(iapRead.Buffer));
+    }
     IapWriteEn = 0;
 }
 /**************************************************************************
@@ -145,29 +173,44 @@ void Iap_Write(void)
 void Iap_Data_Comparison(void)
 {
     uint8_t index;
+    uint8_t eventChanged;
+    uint8_t diffIndex;
+    uint8_t storageValid;
 
     if(globalWorkState == FULL_WORKING)
     {
-        memset(IapRead.Buffer, 0, sizeof(IapRead.Buffer));
-        (void)iap_storage_read_current(IapRead.Buffer, BUFFER_SIZE);
+        memset(iapRead.Buffer, 0, sizeof(iapRead.Buffer));
+        storageValid = iap_storage_read_current(iapRead.Buffer, BUFFER_SIZE);
 
         iap_build_runtime_image(&IapWrite);
-
-        for(index = 1; index < BUFFER_SIZE; index++)
+        if(!storageValid)
         {
-            if(IapRead.Buffer[index] != IapWrite.Buffer[index])
+            IapWriteEn = 1;
+        }
+
+        eventChanged = 0;
+        diffIndex = 0;
+        /* DP18 只对应 5 组事件表，不能把油量等运行值变化也当成事件表变化去上报。 */
+        for(index = 1; storageValid && (index < (1 + sizeof(iapRead.EventData))); index++)
+        {
+            if(iapRead.Buffer[index] != IapWrite.Buffer[index])
             {
-                IapWriteEn = 1;
-                if(!upData.DPID018Back) upData.DPID018Back = 1;
-                if(index < 51) aroma.startTime = 0;
+                eventChanged = 1;
+                diffIndex = index;
                 break;
             }
         }
-        if(IapRead.FanEN != IapWrite.FanEN) {IapWriteEn = 1; if(!upData.DPID004Back) upData.DPID004Back = 1;}
-        if(IapRead.workState != IapWrite.workState) {IapWriteEn = 1; if(!upData.DPID001Back) upData.DPID001Back = 1;}
-        if(IapRead.keyLockState != IapWrite.keyLockState) {IapWriteEn = 1; if(!upData.DPID005Back) upData.DPID005Back = 1;}
-        if(IapRead.curretVolume != IapWrite.curretVolume) {IapWriteEn = 1;if(!upData.DPID020Back) upData.DPID020Back = 1;}
-        if(IapRead.consumeSpeed != IapWrite.consumeSpeed) {IapWriteEn = 1;if(!upData.DPID020Back) upData.DPID020Back = 1;}
+        if(eventChanged)
+        {
+            IapWriteEn = 1;
+            if(!upData.DPID018Back) upData.DPID018Back = 1;
+            aroma.startTime = 0;
+        }
+        if(iapRead.FanEN != IapWrite.FanEN) {IapWriteEn = 1; if(!upData.DPID004Back) upData.DPID004Back = 1;}
+        if(iapRead.workState != IapWrite.workState) {IapWriteEn = 1; if(!upData.DPID001Back) upData.DPID001Back = 1;}
+        if(iapRead.keyLockState != IapWrite.keyLockState) {IapWriteEn = 1; if(!upData.DPID005Back) upData.DPID005Back = 1;}
+        if(iapRead.oilCurretVolume.WORD != IapWrite.oilCurretVolume.WORD) {IapWriteEn = 1; if(!upData.DPID020Back) upData.DPID020Back = 1;}
+        if(iapRead.oilConsumeSpeed.WORD != IapWrite.oilConsumeSpeed.WORD) {IapWriteEn = 1; if(!upData.DPID020Back) upData.DPID020Back = 1;}
 
         if(IapWriteEn)
         {
@@ -183,4 +226,5 @@ void Iap_Data_Comparison(void)
 void Iap_Data_Rest(void)
 {
 }
+
 

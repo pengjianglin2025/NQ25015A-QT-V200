@@ -338,9 +338,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>N32WB03X, USE_STDPERIPH_DRIVER</Define>
+              <Define>N32WB03X, USE_STDPERIPH_DRIVER, APP_OTA_FEATURE_ENABLE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\..\firmware\CMSIS\core;..\..\firmware\CMSIS\device;..\..\firmware\n32wb03x_std_periph_driver\inc;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\dis\diss\api;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\bas\bass\api;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\hogp;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\hogp\hogpd\api;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\hogp\hogpd\src;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\rdts;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\rdts\rdtss\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ahi\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\inc;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\src\gap;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\src\gatt;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\src\l2c;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\src;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\src\llc;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\src\lld;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\src\llm;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\em\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\hci\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\sch\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\aes\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\common\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\dbg\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\ecc_p256\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\h4tl\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\ke\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\rwip\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\rfinit\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\arch;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\common\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\common\src;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\stack_common;..\inc\rw;..\inc\app_profile;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\arch;..\..\middlewares\Nationstech\ble_library\ns_library\adv;..\..\middlewares\Nationstech\ble_library\ns_library\timer;..\..\middlewares\Nationstech\ble_library\ns_library\log;..\..\middlewares\Nationstech\ble_library\ns_library\delay;..\..\middlewares\Nationstech\ble_library\ns_library\sleep;..\..\middlewares\Nationstech\ble_library\ns_library\sec;..\..\middlewares\Nationstech\ble_library\ns_library\ble;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\bas\bass\src;..\user</IncludePath>
+              <IncludePath>..\inc;..\..\firmware\CMSIS\core;..\..\firmware\CMSIS\device;..\..\firmware\n32wb03x_std_periph_driver\inc;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\dis\diss\api;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\bas\bass\api;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\hogp;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\hogp\hogpd\api;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\hogp\hogpd\src;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\rdts;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\rdts\rdtss\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ahi\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\inc;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\src\gap;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\src\gatt;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\hl\src\l2c;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\src;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\src\llc;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\src\lld;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\ble\ll\src\llm;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\em\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\hci\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\ip\sch\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\aes\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\common\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\dbg\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\ecc_p256\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\h4tl\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\ke\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\rwip\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\rfinit\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\arch;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\common\api;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\modules\common\src;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\stack_common;..\inc\rw;..\inc\app_profile;..\..\middlewares\Nationstech\ble_library\ns_ble_stack\arch;..\..\middlewares\Nationstech\ble_library\ns_library\adv;..\..\middlewares\Nationstech\ble_library\ns_library\timer;..\..\middlewares\Nationstech\ble_library\ns_library\log;..\..\middlewares\Nationstech\ble_library\ns_library\delay;..\..\middlewares\Nationstech\ble_library\ns_library\sleep;..\..\middlewares\Nationstech\ble_library\ns_library\sec;..\..\middlewares\Nationstech\ble_library\ns_library\ble;..\..\middlewares\Nationstech\ble_library\ns_library\dfu;..\..\middlewares\Nationstech\ble_library\ns_library\error;..\..\dfu\common;..\..\middlewares\Nationstech\ble_library\ns_ble_profile\bas\bass\src;..\user</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -966,6 +966,11 @@
               <FileName>app_ota_feature.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\app_ota_feature.c</FilePath>
+            </File>
+            <File>
+              <FileName>ns_dfu_boot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\middlewares\Nationstech\ble_library\ns_library\dfu\ns_dfu_boot.c</FilePath>
             </File>
             <File>
               <FileName>app_nv_store.c</FileName>
@@ -1829,6 +1834,11 @@
               <FilePath>..\user\app_ota_feature.c</FilePath>
             </File>
             <File>
+              <FileName>ns_dfu_boot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\middlewares\Nationstech\ble_library\ns_library\dfu\ns_dfu_boot.c</FilePath>
+            </File>
+            <File>
               <FileName>app_nv_store.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\app_nv_store.c</FilePath>
@@ -2687,6 +2697,11 @@
               <FileName>app_ota_feature.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\app_ota_feature.c</FilePath>
+            </File>
+            <File>
+              <FileName>ns_dfu_boot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\middlewares\Nationstech\ble_library\ns_library\dfu\ns_dfu_boot.c</FilePath>
             </File>
             <File>
               <FileName>app_nv_store.c</FileName>

@@ -40,14 +40,15 @@
  /* Includes ------------------------------------------------------------------*/
 #include "ns_dfu_boot.h"
 #include "n32wb03x.h"
-#include "dfu_crc.h"
-#include "ns_error.h"
+/* dfu_crc.h and ns_error.h removed: ns_dfu_boot_force_usart_dfu() is not
+ * called by the application, so its dependencies are not needed here. */
 /* Private typedef -----------------------------------------------------------*/
 typedef void (*func_ptr_t)(void);
 /* Private define ------------------------------------------------------------*/
 /* Private constants ---------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-NS_Bootsetting_t ns_bootsetting __attribute__((at(NS_BOOTSETTING_START_ADDRESS))) __attribute__((used));
+/* ns_bootsetting is now accessed via macro in ns_dfu_boot.h (pointer cast to
+ * NS_BOOTSETTING_START_ADDRESS). No AT() variable needed here. */
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -77,22 +78,9 @@ void ns_dfu_boot_jump(uint32_t address)
  */
 bool ns_dfu_boot_force_usart_dfu(void)
 {
-    NS_Bootsetting_t ns_bootsetting_tmp;
-    memcpy(&ns_bootsetting_tmp,&ns_bootsetting,sizeof(NS_Bootsetting_t));
-    ns_bootsetting_tmp.master_boot_force_update = NS_BOOTSETTING_MASTER_BOOT_FORCE_UPDATE_YES;
-    ns_bootsetting_tmp.crc = dfu_crc32((uint8_t *)&ns_bootsetting_tmp.crc + 4, sizeof(NS_Bootsetting_t) - 4);
-    Qflash_Erase_Sector(NS_BOOTSETTING_START_ADDRESS);
-    Qflash_Write(NS_BOOTSETTING_START_ADDRESS, (uint8_t *)&ns_bootsetting_tmp, sizeof(NS_Bootsetting_t));            
-    
-    if(ns_bootsetting_tmp.crc == dfu_crc32((uint8_t *)((uint32_t *)(NS_BOOTSETTING_START_ADDRESS + 4)), sizeof(NS_Bootsetting_t) - 4))
-    {
-        NVIC_SystemReset();
-        return ERROR_SUCCESS;
-    }
-    else
-    {
-        return ERROR_INTERNAL;
-    }
+    /* Not used by application OTA path - stub to avoid pulling in
+     * dfu_crc.c / ns_error.h / Qflash dependencies. */
+    return false;
 }
 
 

@@ -54,9 +54,9 @@ extern "C" {
 #define KEY_INPUT_PIN_SOURCE  GPIO_PIN_SOURCE1
 #define KEY_INPUT_IRQn        EXTI0_1_IRQn
 
-#define POWER_KEY_GET     GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_1)
+#define POWER_KEY_LEVEL_GET     GPIO_ReadInputDataBit(GPIOB, GPIO_PIN_1)
 /* PA6 当前语义为“正在充电”检测，高电平表示充电进行中。 */
-#define CHARGING_GET     GPIO_ReadInputDataBit(GPIOA, GPIO_PIN_6)
+#define CHARGE_ACTIVE_LEVEL_GET    GPIO_ReadInputDataBit(GPIOA, GPIO_PIN_6)
 
 
 #define CHARGING_INPUT_PORT        GPIOA
@@ -66,14 +66,14 @@ extern "C" {
 #define CHARGING_INPUT_PIN_SOURCE  GPIO_PIN_SOURCE6
 #define CHARGING_INPUT_IRQn        EXTI2_3_IRQn
 
-/* NU1680 电源路径控制/状态脚 */
-#define NU1680_STDBY_SET   GPIO_SetBits(GPIOA, GPIO_PIN_0)
-#define NU1680_STDBY_CLR   GPIO_ResetBits(GPIOA, GPIO_PIN_0)
-#define NU1680_CHRG_GET    GPIO_ReadInputDataBit(GPIOA, GPIO_PIN_1)
-#define EN_6291_SET    GPIO_SetBits(GPIOB, GPIO_PIN_12)  
-#define EN_6291_CLR    GPIO_ResetBits(GPIOB, GPIO_PIN_12)
-#define EN_WSL2309_SET    GPIO_SetBits(GPIOB, GPIO_PIN_0)  
-#define EN_WSL2309_CLR    GPIO_ResetBits(GPIOB, GPIO_PIN_0)
+/* 电源路径待机控制/充电状态检测脚 */
+#define POWER_CTRL_STDBY_SET       GPIO_SetBits(GPIOA, GPIO_PIN_0)
+#define POWER_CTRL_STDBY_CLR       GPIO_ResetBits(GPIOA, GPIO_PIN_0)
+#define POWER_CHARGE_STATE_GET     GPIO_ReadInputDataBit(GPIOA, GPIO_PIN_1)
+#define BOOST_6291_EN_SET          GPIO_SetBits(GPIOB, GPIO_PIN_12)  
+#define BOOST_6291_EN_CLR          GPIO_ResetBits(GPIOB, GPIO_PIN_12)
+#define CHARGE_CTRL_EN_SET         GPIO_SetBits(GPIOB, GPIO_PIN_0)  
+#define CHARGE_CTRL_EN_CLR         GPIO_ResetBits(GPIOB, GPIO_PIN_0)
 
 #define AIRPUMP_OUT_ON   GPIO_SetBits(GPIOB, GPIO_PIN_5)
 #define AIRPUMP_OUT_OFF  GPIO_ResetBits(GPIOB, GPIO_PIN_5)

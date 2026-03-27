@@ -93,7 +93,10 @@ extern int Image$$ER_IROM1$$Base;
 #define NS_BOOTSETTING_MASTER_BOOT_FORCE_UPDATE_NO          (0xFFFFFFFF)
 
 /* Public variables ---------------------------------------------------------*/
-extern NS_Bootsetting_t ns_bootsetting;
+/* Access bootsetting at its fixed flash address via pointer cast.
+ * Using a macro avoids the AT() linker section that causes L6985E
+ * when the application scatter file doesn't cover 0x01002000. */
+#define ns_bootsetting  (*(NS_Bootsetting_t *)NS_BOOTSETTING_START_ADDRESS)
 /* Public function prototypes -----------------------------------------------*/
 void ns_dfu_boot_jump(uint32_t address);
 bool ns_dfu_boot_force_usart_dfu(void);

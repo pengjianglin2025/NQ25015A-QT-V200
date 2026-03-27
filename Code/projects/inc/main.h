@@ -114,9 +114,9 @@ typedef enum
 
 typedef struct 
 {
-	powerS_t status,statusOld;
-	bool sleepAllow;
-	uint16_t offTime,onTime,idleTime;
+	powerS_t state,prevState;
+	bool sleepReady;
+	uint16_t powerOffTicks,powerOnTicks,idleTicks;
 }power_t;
 extern power_t power;
 

@@ -54,6 +54,7 @@
 
 #include "app_usart.h"
 #include "ringbuffer.h"
+#include "app_ble.h"
 
 
 /* Private typedef -----------------------------------------------------------*/
@@ -207,6 +208,7 @@ static int rdtss_16bit_val_write_ind_handler(ke_msg_id_t const msgid,
         case RDTSS_16BIT_IDX_WRITE_VAL:
             NS_LOG_DEBUG("RDTSS_16BIT_IDX_WRITE_VAL\r\n");
 				ringbuffer_putstr(&rb, ind_value->value, ind_value->length);
+                ke_msg_send_basic(APP_PROTOCOL_RX_EVT, TASK_APP, TASK_APP);
 //            app_usart_tx_fifo_enter(ind_value->value,ind_value->length);
           break;
         default:

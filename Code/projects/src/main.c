@@ -42,6 +42,7 @@
 #include "main.h"
 #include "app_ota_feature.h"
 #include "app_sys.h"
+#include "ringbuffer.h"
 
 #if  (CFG_APP_NS_IUS)
 #include "ns_dfu_boot.h"
@@ -71,7 +72,7 @@ int main(void)
 	//for hold the SWD before sleep
 	delay_n_10us(200*1000);
 	
-	power.status = POWER_ON;
+	power.state = POWER_ON;
 	
 	NS_LOG_INIT();
 	gpio_init();
@@ -100,6 +101,8 @@ int main(void)
 	
 	
 	WorkInit();
+	/* 协议接收改成环形队列后，需要在上电时先完成队列初始化。 */
+	Ringbuffer_Init();
 	Key_Init();
 	oil_init(OIL_150ml, DEFAULT_OIL_CONSUME_SPEED_8);
 
@@ -161,7 +164,7 @@ void app_sleep_prepare_proc(void)
 	GPIO_InitType GPIO_InitStructure;
 	
 	/* 仅在逻辑关机状态下准备深睡，避免误触发休眠流程。 */
-	if((power.status == POWER_ON) || (!POWER_KEY_GET) || (power.offTime < 20) || (CHARGING_GET)) return;
+	if((power.state == POWER_ON) || (!POWER_KEY_LEVEL_GET) || (power.powerOffTicks < 20) || (CHARGE_ACTIVE_LEVEL_GET)) return;
 		
 	ke_timer_clear(APP_5MS_EVT, TASK_APP);
 	ke_timer_clear(APP_20MS_EVT, TASK_APP);
@@ -196,7 +199,7 @@ void app_sleep_prepare_proc(void)
 	KeyInputExtiInit(KEY_INPUT_PORT, KEY_INPUT_PIN, ENABLE);
 	ChargingInputExtiInit(ENABLE);
 	
-	power.sleepAllow = 1;
+	power.sleepReady = 1;
 }
 
 /**
@@ -210,12 +213,12 @@ void app_sleep_resume_proc(void)
 	
 	GPIO_InitType GPIO_InitStructure;
 	bool need_runtime_recover;
-	if(!power.sleepAllow) return;
+	if(!power.sleepReady) return;
 	
 	/* 根据唤醒源决定是否恢复系统运行态与软件定时器。 */
 		/* 直接按 DC_IN 判断是否恢复到运行态或关机充电显示态。 */
 	/* PA6 当前按“正在充电”语义参与恢复判断，而非单纯插电存在。 */
-	need_runtime_recover = (power.status == POWER_ON) || (!POWER_KEY_GET) || (CHARGING_GET);
+	need_runtime_recover = (power.state == POWER_ON) || (!POWER_KEY_LEVEL_GET) || (CHARGE_ACTIVE_LEVEL_GET);
 	
 	/* Configure PB.6 (ADC Channe5) as analog input --------*/
 	GPIO_InitStructure.Pin       = GPIO_PIN_6;
@@ -225,7 +228,7 @@ void app_sleep_resume_proc(void)
 		if(need_runtime_recover)
 	{
 		/* 需要恢复运行态时释放 STDBY，并恢复外设工作。 */
-		NU1680_STDBY_CLR;
+		POWER_CTRL_STDBY_CLR;
 		/* 唤醒后恢复软件定时器。 */
 		ke_timer_set(APP_5MS_EVT, TASK_APP, 5);
 		ke_timer_set(APP_20MS_EVT, TASK_APP, 20);
@@ -244,7 +247,7 @@ void app_sleep_resume_proc(void)
 	else
 	{
 		/* 不需要恢复运行态时，保持 NU1680 待机控制。 */
-		NU1680_STDBY_SET;
+		POWER_CTRL_STDBY_SET;
 		/* 保持最小运行状态时，不恢复系统时钟节拍。 */
 		SysTick->CTRL &= ~(SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
 		SysTick->LOAD = 0;
@@ -254,11 +257,11 @@ void app_sleep_resume_proc(void)
 	}
 
 	
-	power.sleepAllow = 0;
-	power.offTime = 0;
+	power.sleepReady = 0;
+	power.powerOffTicks = 0;
 	
 	/* 广播只应在开机状态下恢复。 */
-	if(power.status == POWER_ON)
+	if(power.state == POWER_ON)
 	{
 		ns_ble_adv_start();
 		for(uint8_t i=0; i<10; i++)
