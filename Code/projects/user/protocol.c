@@ -1,4 +1,4 @@
-#include "protocol.h"
+﻿#include "protocol.h"
 #include "mkey.h"
 #include "led.h"
 #include "app_ota_feature.h"
@@ -14,15 +14,15 @@ const eventParameter_t NetDateInit[5] = {{0,0,0,0,0,0,0,0x7f,1,0},
 const char ConncetMode[70] = "{\"p\":\"p11r26_MVZ4NjdLR3F0VUUv\",\"v\":\"1.0.0\",\"tslid\":0,\"m\":0,\"mt\":3}"; 
 
 uint16_t RxCnt = 0,TxCnt = 0;
-uint16_t TxTotalLength=0;  //�����ַ������ܳ���
-uint16_t ReceiveIdleCount = 0,SendIdleCount = 0;  //���ڽ���,��������ʱ��
+uint16_t TxTotalLength=0;  //锟斤拷锟斤拷锟街凤拷锟斤拷锟斤拷锟杰筹拷锟斤拷
+uint16_t ReceiveIdleCount = 0,SendIdleCount = 0;  //锟斤拷锟节斤拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷时锟斤拷
 uint16_t	LocalCheckSum = 0;
 
 upData_t upData;
 net_t net;
-/* ���ջ���ֻ�� protocol.c �ڲ�ά�����ⲿͨ���ӿ��� Buffer ָ�롣 */
+/* 锟斤拷锟秸伙拷锟斤拷只锟斤拷 protocol.c 锟节诧拷维锟斤拷锟斤拷锟解部通锟斤拷锟接匡拷锟斤拷 Buffer 指锟诫。 */
 static Message_t Rx;
-/* ���ͻ���ֻ�� protocol.c �ڲ�ʹ�ã������տڿɼ�����д���ա� */
+/* 锟斤拷锟酵伙拷锟斤拷只锟斤拷 protocol.c 锟节诧拷使锟矫ｏ拷锟斤拷锟斤拷锟秸口可硷拷锟斤拷锟斤拷写锟斤拷锟秸★拷 */
 static Message_t Tx;
 Link_t NetLinkStatus;
 
@@ -51,7 +51,7 @@ void Module_Reset(void)
 	upData.ModuleReset = 1;
 }			 
 
-/* ����ǰЭ���ʽ�����ͨ�� BLE notify ���� App�� */
+/* 锟斤拷锟斤拷前协锟斤拷锟绞斤拷锟斤拷锟斤拷通锟斤拷 BLE notify 锟斤拷锟斤拷 App锟斤拷 */
 void UARTTxData(uint16_t Length)
 {
 	uint16_t i;
@@ -66,7 +66,7 @@ void UARTTxData(uint16_t Length)
 	Tx.Length_H = len.BYTE1;  
 	Tx.Length_L = len.BYTE0; 
 	
-	/**************֡������****************/
+	/**************帧锟斤拷锟斤拷锟斤拷****************/
 	for (i=0; i<(len.WORD+6); i++) { LocalCheckSum += Tx.Buffer[i]; }
 	Tx.Buffer[len.WORD+6] = LocalCheckSum%256;
 	
@@ -76,7 +76,7 @@ void UARTTxData(uint16_t Length)
 	rdtss_16bit_send_notify((uint8_t*)Tx.Buffer, TxTotalLength);
 }
 
-/* �� Rx.Buffer �н���һ֡����Э�飬���ѽ���ַ����� DP ҵ������� */
+/* 锟斤拷 Rx.Buffer 锟叫斤拷锟斤拷一帧锟斤拷锟斤拷协锟介，锟斤拷锟窖斤拷锟斤拷址锟斤拷锟斤拷锟?DP 业锟斤拷锟斤拷锟斤拷锟?*/
 void app_data_parse_task(void)
 {
 	RTC_DateType colckDataTemp;
@@ -86,16 +86,16 @@ void app_data_parse_task(void)
 	uint8_t i,j,n,CheckSumTemp;
 	uint16To2_t TempA;
 	
-	/* net.HaveNewRxData �ɻ��ζ�����ȡ������֡����λ�� */
+	/* net.HaveNewRxData 锟缴伙拷锟轿讹拷锟斤拷锟斤拷取锟斤拷锟斤拷锟斤拷帧锟斤拷锟斤拷位锟斤拷 */
 	if(net.HaveNewRxData)// && (ReceiveIdleCount > INTERVAL_TIME))
 	{
 		
 		LocalCheckSum = 0;
 		CheckSumTemp = 0;
-		/* ����֡ͷ�Ͱ汾У�飬��������������У����жϡ� */
+		/* 锟斤拷锟斤拷帧头锟酵版本校锟介，锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷校锟斤拷锟斤拷卸稀锟?*/
 		if((Rx.Head1 == HEAD1) && (Rx.Head2 == HEAD2) && (Rx.Version == RECEIVE_VERSION))
 		{
-			/* Length ��ʾ�� Command/DP ��ʼ�� payload ���ܳ��ȣ�����ͷ��У���ֽڡ� */
+			/* Length 锟斤拷示锟斤拷 Command/DP 锟斤拷始锟斤拷 payload 锟斤拷锟杰筹拷锟饺ｏ拷锟斤拷锟斤拷头锟斤拷校锟斤拷锟街节★拷 */
 			DataLenght = Rx.Length_H*256 + Rx.Length_L;
 			if(DataLenght > (PROTOCOL_DATA_MAX - 7))
 			{
@@ -110,7 +110,7 @@ void app_data_parse_task(void)
 			CheckSumTemp = LocalCheckSum%256;
 			
 			
-			/* У��ͨ����Ž��������ַַ���������/�����дҵ��״̬�� */
+			/* 校锟斤拷通锟斤拷锟斤拷沤锟斤拷锟斤拷锟斤拷锟斤拷址址锟斤拷锟斤拷锟斤拷锟斤拷锟?锟斤拷锟斤拷锟叫匆碉拷锟阶刺拷锟?*/
 			if(CheckSumTemp == Rx.Buffer[DataLenght+6])
 			{
 				net.dataReceiveFlag = 1;
@@ -163,7 +163,7 @@ void app_data_parse_task(void)
 					}break;
 					case 0x06:
 					{
-						/* 0x06 �� DP �·���ڣ����� DP ���ݳ��ȣ��ٰ� DP_ID ��ҵ������ */
+						/* 0x06 锟斤拷 DP 锟铰凤拷锟斤拷冢锟斤拷锟斤拷锟?DP 锟斤拷锟捷筹拷锟饺ｏ拷锟劫帮拷 DP_ID 锟斤拷业锟斤拷锟斤拷锟斤拷 */
 						DpLength = Rx.DP_Len_H*256 + Rx.DP_Len_L;
 						switch(Rx.DP_ID)
 						{
@@ -196,7 +196,7 @@ void app_data_parse_task(void)
 							}break;
 							case 18: 
 							{ 
-								/* רҵģʽ 5 ���¼������̶� 55 �ֽڣ�������˳������ָ��� */
+								/* 专业模式 5 锟斤拷锟铰硷拷锟斤拷锟斤拷锟教讹拷 55 锟街节ｏ拷锟斤拷锟斤拷锟斤拷顺锟斤拷锟斤拷锟斤拷指锟斤拷锟?*/
 								if(DpLength != 55) { break; }
 								n = 0;
 								for(i=0; i<5; i++)
@@ -222,7 +222,7 @@ void app_data_parse_task(void)
 							}break;
 							case 20: 
 							{ 
-								/* ��������������/��ǰ��/Ĭ���ͺ�/ʣ������/ʵ���ͺġ� */
+								/* 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷/锟斤拷前锟斤拷/默锟斤拷锟酵猴拷/剩锟斤拷锟斤拷锟斤拷/实锟斤拷锟酵耗★拷 */
 								if(DpLength != 8) { break; }
 								n = 0;
 								TempA.BYTE1 = Rx.DP_Data[n++];
@@ -246,7 +246,7 @@ void app_data_parse_task(void)
 							case 26: { upData.DPID026Back = 1;  }break;
 							case 27: 
 							{ 
-								/* ��ģʽ��ʱ��ʣ������� + ��ǰ��λ�� */
+								/* 锟斤拷模式锟斤拷时锟斤拷剩锟斤拷锟斤拷锟斤拷锟?+ 锟斤拷前锟斤拷位锟斤拷 */
 								if(DpLength != 3) { break; }
 								n = 0;
 								TempA.BYTE1 = Rx.DP_Data[n++];
@@ -301,7 +301,7 @@ void app_data_parse_task(void)
 	}
 	
 }
-/* �� upData ��־λ���豸״̬�������ϱ��� App�� */
+/* 锟斤拷 upData 锟斤拷志位锟斤拷锟借备状态锟斤拷锟斤拷锟斤拷锟较憋拷锟斤拷 App锟斤拷 */
 void app_data_up_task(void)
 {
 	static uint8_t CntA,CntB;
@@ -314,7 +314,7 @@ void app_data_up_task(void)
 		net.LinkStatusOld = net.LinkStatus;
 		if(net.LinkStatus != 0x04){net.GetTimeAlready = 0;}
 	}
-	/* �豸һ����������ûУʱ���Ͱ��̶������� App ����ʱ�䡣 */
+	/* 锟借备一锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷没校时锟斤拷锟酵帮拷锟教讹拷锟斤拷锟斤拷锟斤拷 App 锟斤拷锟斤拷时锟戒。 */
 	if(!net.GetTimeAlready)
 	{
 		if(net.LinkStatus == 0x04) 
@@ -433,7 +433,7 @@ void app_data_up_task(void)
 		}
 		else if(upData.DPID020Back)
 		{
-			/* DP20 �ϱ�������ز������� App ��ҳָ�꿨������ҳ��ʹ�á� */
+			/* DP20 锟较憋拷锟斤拷锟斤拷锟斤拷夭锟斤拷锟斤拷锟斤拷锟?App 锟斤拷页指锟疥卡锟斤拷锟斤拷锟斤拷页锟斤拷使锟矫★拷 */
 			Tx.CommandWord = 0x07; Tx.DP_ID = 20; Tx.DP_Type = 0x00; Length.WORD = 8; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0; 
 			
 			n = 0;
@@ -454,7 +454,7 @@ void app_data_up_task(void)
 		}
 		else if(upData.DPID022Back)
 		{
-			/* DP22 �ϱ������������ã�App ��ݴ˾�����ʾ��Щ������ڡ� */
+			/* DP22 锟较憋拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟矫ｏ拷App 锟斤拷荽司锟斤拷锟斤拷锟绞撅拷锟叫╋拷锟斤拷锟斤拷锟节★拷 */
 			Tx.CommandWord = 0x07; Tx.DP_ID = 22; Tx.DP_Type = 0x00; Length.WORD = 7; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0; 
 			
 			n = 0;
@@ -540,11 +540,17 @@ void app_data_up_task(void)
 		}
 		else if(upData.DPID018Back)
 		{
-			/* DPID018 payload=66 bytes, needs MTU>=69. Moved last so DPID020-027
-			   are always sent first. ble_att_mtu is updated by notification confirms
-			   and equals (negotiated_mtu - 3); default=20, after setBLEMTU(256)=253. */
+			/* DPID018 payload is 59 bytes on-air, so keep it pending until the
+			   negotiated notify payload is large enough. app_env.max_mtu is updated
+			   by the BLE stack before app_usart refreshes ble_att_mtu. */
 			extern uint16_t ble_att_mtu;
-			if(ble_att_mtu >= 66)
+			uint16_t notify_payload_mtu = ble_att_mtu;
+			if((app_env.max_mtu > 3) && ((app_env.max_mtu - 3) > notify_payload_mtu))
+			{
+				notify_payload_mtu = (app_env.max_mtu - 3);
+				ble_att_mtu = notify_payload_mtu;
+			}
+			if(notify_payload_mtu >= 59)
 			{
 				Tx.CommandWord = 0x07; Tx.DP_ID = 18; Tx.DP_Type = 0x00; Length.WORD = 55; Tx.DP_Len_H = Length.BYTE1; Tx.DP_Len_L = Length.BYTE0;
 
@@ -567,10 +573,11 @@ void app_data_up_task(void)
 				}
 
 				UARTTxData(59);
+				upData.DPID018Back = 0;
 			}
-			upData.DPID018Back = 0;
 		}
 
 //	}
 }
+
 
